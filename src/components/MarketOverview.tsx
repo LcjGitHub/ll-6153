@@ -24,6 +24,18 @@ const iconWrapperStyle = (color: string) => ({
   flexShrink: 0,
 });
 
+/**
+ * 今日市场概览卡片组
+ *
+ * 用四个卡片分别展示当前菜价列表中的：
+ * - 涨价菜品数量（图标红色上箭头）
+ * - 降价菜品数量（图标绿色下箭头）
+ * - 持平菜品数量（图标灰色横线）
+ * - 可见菜品的平均价格（图标蓝色柱图）
+ *
+ * 卡片采用响应式弹性布局，窄屏下会自动换行，
+ * 数据随传入的 stats 联动更新。
+ */
 export function MarketOverview({ stats }: MarketOverviewProps) {
   const { upCount, downCount, flatCount, avgPrice } = stats;
 
@@ -33,7 +45,7 @@ export function MarketOverview({ stats }: MarketOverviewProps) {
       value: upCount,
       unit: '种',
       icon: IconArrowUp,
-      iconBg: 'rgba(var(--semi-red-0), 0.15)',
+      iconBg: 'rgba(255, 77, 79, 0.12)',
       iconColor: 'var(--semi-color-danger)',
     },
     {
@@ -41,7 +53,7 @@ export function MarketOverview({ stats }: MarketOverviewProps) {
       value: downCount,
       unit: '种',
       icon: IconArrowDown,
-      iconBg: 'rgba(var(--semi-green-0), 0.15)',
+      iconBg: 'rgba(0, 180, 42, 0.12)',
       iconColor: 'var(--semi-color-success)',
     },
     {
@@ -49,7 +61,7 @@ export function MarketOverview({ stats }: MarketOverviewProps) {
       value: flatCount,
       unit: '种',
       icon: IconMinus,
-      iconBg: 'rgba(var(--semi-grey-1), 0.6)',
+      iconBg: 'rgba(118, 121, 128, 0.15)',
       iconColor: 'var(--semi-color-text-2)',
     },
     {
@@ -57,7 +69,7 @@ export function MarketOverview({ stats }: MarketOverviewProps) {
       value: avgPrice.toFixed(2),
       unit: '元/斤',
       icon: IconHistogram,
-      iconBg: 'rgba(var(--semi-blue-0), 0.15)',
+      iconBg: 'rgba(22, 93, 255, 0.12)',
       iconColor: 'var(--semi-color-primary)',
     },
   ];
@@ -65,16 +77,20 @@ export function MarketOverview({ stats }: MarketOverviewProps) {
   return (
     <div
       style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
+        display: 'flex',
+        flexWrap: 'wrap',
         gap: 16,
-        marginBottom: 20,
+        marginBottom: 4,
       }}
     >
       {cards.map((card) => {
         const Icon = card.icon;
         return (
-          <Card key={card.title} bodyStyle={{ padding: 0 }}>
+          <Card
+            key={card.title}
+            bodyStyle={{ padding: 0 }}
+            style={{ flex: '1 1 240px', minWidth: 220 }}
+          >
             <div style={cardStyle}>
               <div style={iconWrapperStyle(card.iconBg)}>
                 <Icon size="large" style={{ color: card.iconColor }} />

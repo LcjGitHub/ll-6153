@@ -92,7 +92,12 @@ export function PriceListPage() {
         </div>
       </header>
 
-      <MarketOverview stats={overviewStats} />
+      <section>
+        <Typography.Title heading={5} style={{ marginBottom: 12 }}>
+          今日市场概览
+        </Typography.Title>
+        <MarketOverview stats={overviewStats} />
+      </section>
 
       <Table
         columns={columns}
