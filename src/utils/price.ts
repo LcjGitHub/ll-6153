@@ -17,7 +17,44 @@ export function findVegetableByName(name: string): VegetablePrice | undefined {
  * @param keyword - 搜索关键词
  * @param category - 菜品种类，空字符串表示全部
  */
-export function filterVegetables(keyword: string, category?: string): VegetablePrice[] {
+export interface PriceRange {
+  min?: number;
+  max?: number;
+}
+
+export function validatePriceRange(range: PriceRange): string | null {
+  if (range.min !== undefined && range.max !== undefined && range.min > range.max) {
+    return '最低价不能大于最高价';
+  }
+  return null;
+}
+
+export function filterByPriceRange(list: VegetablePrice[], range: PriceRange): VegetablePrice[] {
+  return list.filter((item) => {
+    if (range.min !== undefined && item.avgPrice < range.min) {
+      return false;
+    }
+    if (range.max !== undefined && item.avgPrice > range.max) {
+      return false;
+    }
+    return true;
+  });
+}
+
+export function formatPriceRangeDescription(range: PriceRange): string {
+  if (range.min !== undefined && range.max !== undefined) {
+    return `${formatPrice(range.min)} ~ ${formatPrice(range.max)} 元`;
+  }
+  if (range.min !== undefined) {
+    return `≥ ${formatPrice(range.min)} 元`;
+  }
+  if (range.max !== undefined) {
+    return `≤ ${formatPrice(range.max)} 元`;
+  }
+  return '';
+}
+
+export function filterVegetables(keyword: string, category?: string, range?: PriceRange): VegetablePrice[] {
   const trimmed = keyword.trim();
   let result = vegetablePrices;
 
@@ -26,9 +63,16 @@ export function filterVegetables(keyword: string, category?: string): VegetableP
   }
 
   if (!trimmed) {
-    return result;
+    result = result.filter(() => true);
+  } else {
+    result = result.filter((item) => item.name.includes(trimmed));
   }
-  return result.filter((item) => item.name.includes(trimmed));
+
+  if (range && (range.min !== undefined || range.max !== undefined)) {
+    result = filterByPriceRange(result, range);
+  }
+
+  return result;
 }
 
 /**

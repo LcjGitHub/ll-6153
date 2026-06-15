@@ -1,13 +1,14 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconSearch } from '@douyinfe/semi-icons';
-import { Button, Input, Select, Table, Typography } from '@douyinfe/semi-ui';
+import { Button, Input, InputNumber, Select, Table, Typography } from '@douyinfe/semi-ui';
 import type { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import dayjs from 'dayjs';
 import { PriceChange } from '../components/PriceChange';
 import { MarketOverview } from '../components/MarketOverview';
 import type { VegetableCategory, VegetablePrice } from '../types/vegetable';
-import { filterVegetables, getMarketOverviewStats } from '../utils/price';
+import { filterVegetables, formatPriceRangeDescription, getMarketOverviewStats, validatePriceRange } from '../utils/price';
+import type { PriceRange } from '../utils/price';
 
 const CATEGORY_OPTIONS = [
   { label: '全部', value: '' },
@@ -24,8 +25,32 @@ export function PriceListPage() {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState<VegetableCategory | ''>('');
+  const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
+  const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
+  const [priceError, setPriceError] = useState<string | null>(null);
 
-  const dataSource = useMemo(() => filterVegetables(keyword, category), [keyword, category]);
+  const priceRange: PriceRange = { min: minPrice, max: maxPrice };
+
+  const handleMinPriceChange = (value: number | string | null | undefined) => {
+    const num = value === null || value === undefined || value === '' ? undefined : Number(value);
+    const nextRange: PriceRange = { min: num, max: maxPrice };
+    const error = validatePriceRange(nextRange);
+    setPriceError(error);
+    setMinPrice(num);
+  };
+
+  const handleMaxPriceChange = (value: number | string | null | undefined) => {
+    const num = value === null || value === undefined || value === '' ? undefined : Number(value);
+    const nextRange: PriceRange = { min: minPrice, max: num };
+    const error = validatePriceRange(nextRange);
+    setPriceError(error);
+    setMaxPrice(num);
+  };
+
+  const dataSource = useMemo(
+    () => (priceError ? [] : filterVegetables(keyword, category, priceRange)),
+    [keyword, category, priceRange, priceError],
+  );
   const overviewStats = useMemo(() => getMarketOverviewStats(dataSource), [dataSource]);
 
   const columns: ColumnProps<VegetablePrice>[] = [
@@ -88,6 +113,29 @@ export function PriceListPage() {
               showClear
               style={{ width: 260 }}
             />
+            <span style={{ fontSize: 14, color: 'var(--semi-color-text-2)', whiteSpace: 'nowrap', paddingLeft: 12, paddingRight: 6 }}>最低价</span>
+            <InputNumber
+              min={0}
+              placeholder="不限"
+              value={minPrice}
+              onChange={handleMinPriceChange}
+              style={{ width: 100 }}
+              innerButtons
+            />
+            <span style={{ fontSize: 14, color: 'var(--semi-color-text-2)', whiteSpace: 'nowrap', paddingLeft: 8, paddingRight: 6 }}>最高价</span>
+            <InputNumber
+              min={0}
+              placeholder="不限"
+              value={maxPrice}
+              onChange={handleMaxPriceChange}
+              style={{ width: 100 }}
+              innerButtons
+            />
+            {priceError && (
+              <Typography.Text type="danger" size="small" style={{ whiteSpace: 'nowrap', paddingLeft: 8 }}>
+                {priceError}
+              </Typography.Text>
+            )}
           </div>
         </div>
       </header>
@@ -114,13 +162,27 @@ export function PriceListPage() {
         })}
         empty={
           <Typography.Text type="secondary">
-            {category && keyword.trim()
-              ? `${category}品类下未找到「${keyword.trim()}」相关菜品`
-              : category
-                ? `${category}品类下暂无菜品`
-                : keyword.trim()
-                  ? `未找到「${keyword.trim()}」相关菜品`
-                  : '暂无菜品数据'}
+            {priceError
+              ? priceError
+              : (minPrice !== undefined || maxPrice !== undefined) && dataSource.length === 0
+                ? (() => {
+                    const rangeDesc = formatPriceRangeDescription(priceRange);
+                    const prefix = category
+                      ? keyword.trim()
+                        ? `${category}品类下未找到「${keyword.trim()}」且均价${rangeDesc}的菜品`
+                        : `${category}品类下未找到均价${rangeDesc}的菜品`
+                      : keyword.trim()
+                        ? `未找到「${keyword.trim()}」且均价${rangeDesc}的菜品`
+                        : `未找到均价${rangeDesc}的菜品`;
+                    return prefix;
+                  })()
+                : category && keyword.trim()
+                  ? `${category}品类下未找到「${keyword.trim()}」相关菜品`
+                  : category
+                    ? `${category}品类下暂无菜品`
+                    : keyword.trim()
+                      ? `未找到「${keyword.trim()}」相关菜品`
+                      : '暂无菜品数据'}
           </Typography.Text>
         }
       />
