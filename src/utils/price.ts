@@ -102,3 +102,38 @@ export function getPriceRanking(topN = 5): PriceRanking {
 
   return { topGainers, topLosers };
 }
+
+/** 市场概览统计 */
+export interface MarketOverviewStats {
+  upCount: number;
+  downCount: number;
+  flatCount: number;
+  avgPrice: number;
+}
+
+/**
+ * 计算菜价列表的市场概览统计
+ * @param list - 菜价列表
+ */
+export function getMarketOverviewStats(list: VegetablePrice[]): MarketOverviewStats {
+  let upCount = 0;
+  let downCount = 0;
+  let flatCount = 0;
+  let totalPrice = 0;
+
+  list.forEach((item) => {
+    const trend = getPriceTrend(item.avgPrice, item.prevPrice);
+    if (trend === 'up') {
+      upCount++;
+    } else if (trend === 'down') {
+      downCount++;
+    } else {
+      flatCount++;
+    }
+    totalPrice += item.avgPrice;
+  });
+
+  const avgPrice = list.length > 0 ? Number((totalPrice / list.length).toFixed(2)) : 0;
+
+  return { upCount, downCount, flatCount, avgPrice };
+}

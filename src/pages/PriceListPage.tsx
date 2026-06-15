@@ -5,8 +5,9 @@ import { Button, Input, Select, Table, Typography } from '@douyinfe/semi-ui';
 import type { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import dayjs from 'dayjs';
 import { PriceChange } from '../components/PriceChange';
+import { MarketOverview } from '../components/MarketOverview';
 import type { VegetableCategory, VegetablePrice } from '../types/vegetable';
-import { filterVegetables } from '../utils/price';
+import { filterVegetables, getMarketOverviewStats } from '../utils/price';
 
 const CATEGORY_OPTIONS = [
   { label: '全部', value: '' },
@@ -25,6 +26,7 @@ export function PriceListPage() {
   const [category, setCategory] = useState<VegetableCategory | ''>('');
 
   const dataSource = useMemo(() => filterVegetables(keyword, category), [keyword, category]);
+  const overviewStats = useMemo(() => getMarketOverviewStats(dataSource), [dataSource]);
 
   const columns: ColumnProps<VegetablePrice>[] = [
     {
@@ -89,6 +91,8 @@ export function PriceListPage() {
           </div>
         </div>
       </header>
+
+      <MarketOverview stats={overviewStats} />
 
       <Table
         columns={columns}
