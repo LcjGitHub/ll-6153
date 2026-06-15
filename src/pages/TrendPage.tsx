@@ -1,11 +1,13 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { IconArrowLeft } from '@douyinfe/semi-icons';
-import { Button, Card, Empty, Typography } from '@douyinfe/semi-ui';
+import { Button, Card, Empty, Tag, Typography } from '@douyinfe/semi-ui';
 import dayjs from 'dayjs';
 import { TrendChart } from '../components/TrendChart';
 import { PriceChange } from '../components/PriceChange';
 import { findVegetableByName, getAllVegetableNames } from '../utils/price';
+import { getRecentViews, saveRecentView } from '../utils/storage';
+import type { RecentViewItem } from '../utils/storage';
 
 /**
  * 单品 7 日走势页
@@ -19,6 +21,7 @@ export function TrendPage() {
   const allNames = useMemo(() => getAllVegetableNames(), []);
   const scrollRef = useRef<HTMLDivElement>(null);
   const activeName = vegetable?.name ?? name;
+  const [recentViews, setRecentViews] = useState<RecentViewItem[]>([]);
 
   const handleVegetableClick = (targetName: string) => {
     if (targetName === activeName) {
@@ -45,6 +48,19 @@ export function TrendPage() {
       });
     }
   }, [activeName]);
+
+  useEffect(() => {
+    if (activeName) {
+      saveRecentView(activeName);
+      setRecentViews(getRecentViews());
+    }
+  }, [activeName]);
+
+  useEffect(() => {
+    const handleStorage = () => setRecentViews(getRecentViews());
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   const switcher = (
     <div className="vegetable-switcher">
@@ -78,6 +94,30 @@ export function TrendPage() {
           </Link>
         </Empty>
         {switcher}
+
+        {recentViews.length > 0 && (
+          <Card className="recent-views-card">
+            <Typography.Title heading={6} style={{ marginBottom: 12 }}>
+              最近浏览
+            </Typography.Title>
+            <div className="recent-views-list">
+              {recentViews.map((item) => (
+                <Tag
+                  key={item.name}
+                  color="white"
+                  size="large"
+                  style={{ cursor: 'pointer', marginBottom: 8 }}
+                  onClick={() => navigate(`/item/${encodeURIComponent(item.name)}`)}
+                >
+                  {item.name}
+                  <Typography.Text type="tertiary" style={{ marginLeft: 6, fontSize: 12 }}>
+                    {dayjs(item.timestamp).format('HH:mm')}
+                  </Typography.Text>
+                </Tag>
+              ))}
+            </div>
+          </Card>
+        )}
       </div>
     );
   }
@@ -137,6 +177,37 @@ export function TrendPage() {
           history7d={vegetable.history7d}
         />
       </Card>
+
+      {recentViews.length > 0 && (
+        <Card className="recent-views-card">
+          <Typography.Title heading={6} style={{ marginBottom: 12 }}>
+            最近浏览
+          </Typography.Title>
+          <div className="recent-views-list">
+            {recentViews.map((item) => (
+              <Tag
+                key={item.name}
+                color={item.name === activeName ? 'blue' : 'white'}
+                size="large"
+                style={{
+                  cursor: item.name === activeName ? 'default' : 'pointer',
+                  marginBottom: 8,
+                }}
+                onClick={() => {
+                  if (item.name !== activeName) {
+                    navigate(`/item/${encodeURIComponent(item.name)}`);
+                  }
+                }}
+              >
+                {item.name}
+                <Tag.Text type="tertiary" style={{ marginLeft: 6, fontSize: 12 }}>
+                  {dayjs(item.timestamp).format('HH:mm')}
+                </Tag.Text>
+              </Tag>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   );
 }

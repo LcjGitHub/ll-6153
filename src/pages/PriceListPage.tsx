@@ -1,7 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconArrowDown, IconArrowUp, IconSearch } from '@douyinfe/semi-icons';
-import { Button, Input, InputNumber, Select, Table, Typography } from '@douyinfe/semi-ui';
+import { Button, Input, InputNumber, Select, Table, Tag, Typography } from '@douyinfe/semi-ui';
 import type { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import dayjs from 'dayjs';
 import { PriceChange } from '../components/PriceChange';
@@ -16,6 +16,8 @@ import {
   validatePriceRange,
 } from '../utils/price';
 import type { PriceRange, SortField, SortState } from '../utils/price';
+import { getRecentViews } from '../utils/storage';
+import type { RecentViewItem } from '../utils/storage';
 
 const CATEGORY_OPTIONS = [
   { label: '全部', value: '' },
@@ -36,8 +38,21 @@ export function PriceListPage() {
   const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
   const [priceError, setPriceError] = useState<string | null>(null);
   const [sortState, setSortState] = useState<SortState>({ field: null, order: null });
+  const [recentViews, setRecentViews] = useState<RecentViewItem[]>([]);
 
   const priceRange: PriceRange = { min: minPrice, max: maxPrice };
+
+  useEffect(() => {
+    setRecentViews(getRecentViews());
+    const handleStorage = () => setRecentViews(getRecentViews());
+    const handleFocus = () => setRecentViews(getRecentViews());
+    window.addEventListener('storage', handleStorage);
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, []);
 
   const handleSortClick = (field: SortField) => {
     setSortState((prev) => getNextSortState(prev, field));
@@ -186,6 +201,28 @@ export function PriceListPage() {
               </Typography.Text>
             )}
           </div>
+
+          {recentViews.length > 0 && (
+            <div className="recent-views-section" style={{ marginTop: 8 }}>
+              <Typography.Text type="secondary" size="small" style={{ marginRight: 8 }}>
+                最近浏览：
+              </Typography.Text>
+              {recentViews.map((item) => (
+                <Tag
+                  key={item.name}
+                  color="white"
+                  size="small"
+                  style={{ cursor: 'pointer', marginBottom: 4 }}
+                  onClick={() => navigate(`/item/${encodeURIComponent(item.name)}`)}
+                >
+                  {item.name}
+                  <Typography.Text type="tertiary" style={{ marginLeft: 4, fontSize: 11 }}>
+                    {dayjs(item.timestamp).format('HH:mm')}
+                  </Typography.Text>
+                </Tag>
+              ))}
+            </div>
+          )}
         </div>
       </header>
 
