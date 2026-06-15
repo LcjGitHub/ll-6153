@@ -1,6 +1,7 @@
 [
   {
     "name": "大白菜",
+    "category": "叶菜",
     "unit": "元/斤",
     "avgPrice": 1.28,
     "prevPrice": 1.35,
@@ -16,6 +17,7 @@
   },
   {
     "name": "小油菜",
+    "category": "叶菜",
     "unit": "元/斤",
     "avgPrice": 2.86,
     "prevPrice": 2.72,
@@ -31,6 +33,7 @@
   },
   {
     "name": "西红柿",
+    "category": "瓜果",
     "unit": "元/斤",
     "avgPrice": 3.45,
     "prevPrice": 3.52,
@@ -46,6 +49,7 @@
   },
   {
     "name": "黄瓜",
+    "category": "瓜果",
     "unit": "元/斤",
     "avgPrice": 2.18,
     "prevPrice": 2.05,
@@ -61,6 +65,7 @@
   },
   {
     "name": "土豆",
+    "category": "根茎",
     "unit": "元/斤",
     "avgPrice": 1.56,
     "prevPrice": 1.56,
@@ -76,6 +81,7 @@
   },
   {
     "name": "胡萝卜",
+    "category": "根茎",
     "unit": "元/斤",
     "avgPrice": 2.34,
     "prevPrice": 2.28,
@@ -91,6 +97,7 @@
   },
   {
     "name": "茄子",
+    "category": "瓜果",
     "unit": "元/斤",
     "avgPrice": 2.92,
     "prevPrice": 3.08,
@@ -106,6 +113,7 @@
   },
   {
     "name": "青椒",
+    "category": "瓜果",
     "unit": "元/斤",
     "avgPrice": 4.18,
     "prevPrice": 4.05,
@@ -121,6 +129,7 @@
   },
   {
     "name": "芹菜",
+    "category": "叶菜",
     "unit": "元/斤",
     "avgPrice": 3.12,
     "prevPrice": 3.24,
@@ -136,6 +145,7 @@
   },
   {
     "name": "生姜",
+    "category": "调味",
     "unit": "元/斤",
     "avgPrice": 6.85,
     "prevPrice": 6.72,
@@ -151,6 +161,7 @@
   },
   {
     "name": "大蒜",
+    "category": "调味",
     "unit": "元/斤",
     "avgPrice": 5.42,
     "prevPrice": 5.58,
@@ -166,6 +177,7 @@
   },
   {
     "name": "豆角",
+    "category": "瓜果",
     "unit": "元/斤",
     "avgPrice": 4.65,
     "prevPrice": 4.48,
@@ -181,6 +193,7 @@
   },
   {
     "name": "菠菜",
+    "category": "叶菜",
     "unit": "元/斤",
     "avgPrice": 3.78,
     "prevPrice": 3.65,
@@ -196,6 +209,7 @@
   },
   {
     "name": "菜花",
+    "category": "叶菜",
     "unit": "元/斤",
     "avgPrice": 2.68,
     "prevPrice": 2.75,
@@ -211,6 +225,7 @@
   },
   {
     "name": "莲藕",
+    "category": "根茎",
     "unit": "元/斤",
     "avgPrice": 5.28,
     "prevPrice": 5.15,
@@ -226,6 +241,7 @@
   },
   {
     "name": "冬瓜",
+    "category": "瓜果",
     "unit": "元/斤",
     "avgPrice": 1.08,
     "prevPrice": 1.12,
@@ -241,6 +257,7 @@
   },
   {
     "name": "洋葱",
+    "category": "根茎",
     "unit": "元/斤",
     "avgPrice": 1.88,
     "prevPrice": 1.88,

@@ -13,15 +13,22 @@ export function findVegetableByName(name: string): VegetablePrice | undefined {
 }
 
 /**
- * 按关键词过滤菜价列表
+ * 按关键词和品类过滤菜价列表
  * @param keyword - 搜索关键词
+ * @param category - 菜品种类，空字符串表示全部
  */
-export function filterVegetables(keyword: string): VegetablePrice[] {
+export function filterVegetables(keyword: string, category?: string): VegetablePrice[] {
   const trimmed = keyword.trim();
-  if (!trimmed) {
-    return vegetablePrices;
+  let result = vegetablePrices;
+
+  if (category) {
+    result = result.filter((item) => item.category === category);
   }
-  return vegetablePrices.filter((item) => item.name.includes(trimmed));
+
+  if (!trimmed) {
+    return result;
+  }
+  return result.filter((item) => item.name.includes(trimmed));
 }
 
 /**

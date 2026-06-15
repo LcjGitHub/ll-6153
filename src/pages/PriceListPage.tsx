@@ -1,12 +1,20 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconSearch } from '@douyinfe/semi-icons';
-import { Button, Input, Table, Typography } from '@douyinfe/semi-ui';
+import { Button, Input, Select, Table, Typography } from '@douyinfe/semi-ui';
 import type { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import dayjs from 'dayjs';
 import { PriceChange } from '../components/PriceChange';
-import type { VegetablePrice } from '../types/vegetable';
+import type { VegetableCategory, VegetablePrice } from '../types/vegetable';
 import { filterVegetables } from '../utils/price';
+
+const CATEGORY_OPTIONS = [
+  { label: '全部', value: '' },
+  { label: '叶菜', value: '叶菜' },
+  { label: '根茎', value: '根茎' },
+  { label: '瓜果', value: '瓜果' },
+  { label: '调味', value: '调味' },
+];
 
 /**
  * 今日菜价公示页
@@ -14,8 +22,9 @@ import { filterVegetables } from '../utils/price';
 export function PriceListPage() {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState('');
+  const [category, setCategory] = useState<VegetableCategory | ''>('');
 
-  const dataSource = useMemo(() => filterVegetables(keyword), [keyword]);
+  const dataSource = useMemo(() => filterVegetables(keyword, category), [keyword, category]);
 
   const columns: ColumnProps<VegetablePrice>[] = [
     {
@@ -58,6 +67,12 @@ export function PriceListPage() {
           <Button onClick={() => navigate('/排行榜')}>
             查看涨跌排行榜
           </Button>
+          <Select
+            value={category}
+            onChange={(value) => setCategory(value as VegetableCategory | '')}
+            optionList={CATEGORY_OPTIONS}
+            style={{ width: 120 }}
+          />
           <Input
             prefix={<IconSearch />}
             placeholder="按菜名搜索"
