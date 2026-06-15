@@ -75,6 +75,54 @@ body {
   gap: 4px;
 }
 
+.vegetable-switcher {
+  background: var(--semi-color-bg-2);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.vegetable-switcher-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 2px;
+  scrollbar-width: thin;
+}
+
+.vegetable-switcher-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.vegetable-switcher-scroll::-webkit-scrollbar-thumb {
+  background: var(--semi-color-border);
+  border-radius: 3px;
+}
+
+.vegetable-switcher-item {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border: 1px solid var(--semi-color-border);
+  border-radius: 6px;
+  background: var(--semi-color-bg-0);
+  color: var(--semi-color-text-1);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.vegetable-switcher-item:hover {
+  border-color: var(--semi-color-primary-light-default);
+  color: var(--semi-color-primary);
+}
+
+.vegetable-switcher-item.active {
+  background: var(--semi-color-primary);
+  border-color: var(--semi-color-primary);
+  color: #fff;
+  font-weight: 500;
+}
+
 @media (max-width: 640px) {
   .page-header {
     flex-direction: column;

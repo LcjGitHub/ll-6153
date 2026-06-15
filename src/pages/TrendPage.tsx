@@ -5,7 +5,7 @@ import { Button, Card, Empty, Typography } from '@douyinfe/semi-ui';
 import dayjs from 'dayjs';
 import { TrendChart } from '../components/TrendChart';
 import { PriceChange } from '../components/PriceChange';
-import { findVegetableByName } from '../utils/price';
+import { findVegetableByName, getAllVegetableNames } from '../utils/price';
 
 /**
  * 单品 7 日走势页
@@ -16,6 +16,11 @@ export function TrendPage() {
   const name = encodedName ? decodeURIComponent(encodedName) : '';
 
   const vegetable = useMemo(() => findVegetableByName(name), [name]);
+  const allNames = useMemo(() => getAllVegetableNames(), []);
+
+  const handleVegetableClick = (targetName: string) => {
+    navigate(`/item/${encodeURIComponent(targetName)}`);
+  };
 
   if (!vegetable) {
     return (
@@ -53,6 +58,21 @@ export function TrendPage() {
           </div>
         </div>
       </header>
+
+      <div className="vegetable-switcher">
+        <div className="vegetable-switcher-scroll">
+          {allNames.map((itemName) => (
+            <button
+              key={itemName}
+              className={`vegetable-switcher-item${itemName === vegetable.name ? ' active' : ''}`}
+              onClick={() => handleVegetableClick(itemName)}
+              type="button"
+            >
+              {itemName}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <Card className="summary-card">
         <div className="summary-item">

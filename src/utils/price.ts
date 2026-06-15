@@ -13,6 +13,15 @@ export function findVegetableByName(name: string): VegetablePrice | undefined {
 }
 
 /**
+ * 获取全部菜名列表（按菜名拼音/汉字顺序排序）
+ */
+export function getAllVegetableNames(): string[] {
+  return vegetablePrices
+    .map((item) => item.name)
+    .sort((a, b) => a.localeCompare(b, 'zh-CN'));
+}
+
+/**
  * 价格区间
  * @property min - 最低价，`undefined` 表示不限制下限
  * @property max - 最高价，`undefined` 表示不限制上限
