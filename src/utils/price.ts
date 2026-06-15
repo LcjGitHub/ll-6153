@@ -13,15 +13,20 @@ export function findVegetableByName(name: string): VegetablePrice | undefined {
 }
 
 /**
- * 按关键词和品类过滤菜价列表
- * @param keyword - 搜索关键词
- * @param category - 菜品种类，空字符串表示全部
+ * 价格区间
+ * @property min - 最低价，`undefined` 表示不限制下限
+ * @property max - 最高价，`undefined` 表示不限制上限
  */
 export interface PriceRange {
   min?: number;
   max?: number;
 }
 
+/**
+ * 校验价格区间是否合法
+ * @param range - 价格区间
+ * @returns 错误信息，合法时返回 `null`
+ */
 export function validatePriceRange(range: PriceRange): string | null {
   if (range.min !== undefined && range.max !== undefined && range.min > range.max) {
     return '最低价不能大于最高价';
@@ -29,6 +34,11 @@ export function validatePriceRange(range: PriceRange): string | null {
   return null;
 }
 
+/**
+ * 按价格区间过滤菜价列表（今日均价格在区间内）
+ * @param list - 菜价列表
+ * @param range - 价格区间，留空一侧表示不限制
+ */
 export function filterByPriceRange(list: VegetablePrice[], range: PriceRange): VegetablePrice[] {
   return list.filter((item) => {
     if (range.min !== undefined && item.avgPrice < range.min) {
@@ -41,19 +51,30 @@ export function filterByPriceRange(list: VegetablePrice[], range: PriceRange): V
   });
 }
 
+/**
+ * 将价格区间格式化为中文可读描述
+ * @param range - 价格区间
+ * @returns 形如 "1.00 ~ 5.00 元"、"不低于 3.00 元"、"不超过 8.00 元" 的描述，无限制时返回空字符串
+ */
 export function formatPriceRangeDescription(range: PriceRange): string {
   if (range.min !== undefined && range.max !== undefined) {
     return `${formatPrice(range.min)} ~ ${formatPrice(range.max)} 元`;
   }
   if (range.min !== undefined) {
-    return `≥ ${formatPrice(range.min)} 元`;
+    return `不低于 ${formatPrice(range.min)} 元`;
   }
   if (range.max !== undefined) {
-    return `≤ ${formatPrice(range.max)} 元`;
+    return `不超过 ${formatPrice(range.max)} 元`;
   }
   return '';
 }
 
+/**
+ * 按关键词、品类和价格区间过滤菜价列表
+ * @param keyword - 搜索关键词
+ * @param category - 菜品种类，空字符串表示全部
+ * @param range - 价格区间，留空一侧表示不限制
+ */
 export function filterVegetables(keyword: string, category?: string, range?: PriceRange): VegetablePrice[] {
   const trimmed = keyword.trim();
   let result = vegetablePrices;

@@ -90,15 +90,17 @@ export function PriceListPage() {
             数据日期：{dayjs().format('YYYY-MM-DD')} · Mock 数据，仅供参考
           </Typography.Text>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Button onClick={() => navigate('/排行榜')}>
-            查看涨跌排行榜
-          </Button>
-          <Button onClick={() => navigate('/对比')}>
-            多菜品走势对比
-          </Button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
-            <span style={{ fontSize: 14, color: 'var(--semi-color-text-2)', whiteSpace: 'nowrap', paddingRight: 6 }}>品类</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <Button onClick={() => navigate('/排行榜')}>
+              查看涨跌排行榜
+            </Button>
+            <Button onClick={() => navigate('/对比')}>
+              多菜品走势对比
+            </Button>
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
+            <span style={{ fontSize: 14, color: 'var(--semi-color-text-2)', whiteSpace: 'nowrap' }}>品类</span>
             <Select
               value={category}
               onChange={(value) => setCategory(value as VegetableCategory | '')}
@@ -113,7 +115,7 @@ export function PriceListPage() {
               showClear
               style={{ width: 260 }}
             />
-            <span style={{ fontSize: 14, color: 'var(--semi-color-text-2)', whiteSpace: 'nowrap', paddingLeft: 12, paddingRight: 6 }}>最低价</span>
+            <span style={{ fontSize: 14, color: 'var(--semi-color-text-2)', whiteSpace: 'nowrap' }}>最低价</span>
             <InputNumber
               min={0}
               placeholder="不限"
@@ -122,7 +124,7 @@ export function PriceListPage() {
               style={{ width: 100 }}
               innerButtons
             />
-            <span style={{ fontSize: 14, color: 'var(--semi-color-text-2)', whiteSpace: 'nowrap', paddingLeft: 8, paddingRight: 6 }}>最高价</span>
+            <span style={{ fontSize: 14, color: 'var(--semi-color-text-2)', whiteSpace: 'nowrap' }}>最高价</span>
             <InputNumber
               min={0}
               placeholder="不限"
@@ -132,7 +134,7 @@ export function PriceListPage() {
               innerButtons
             />
             {priceError && (
-              <Typography.Text type="danger" size="small" style={{ whiteSpace: 'nowrap', paddingLeft: 8 }}>
+              <Typography.Text type="danger" size="small" style={{ whiteSpace: 'nowrap' }}>
                 {priceError}
               </Typography.Text>
             )}
@@ -162,27 +164,24 @@ export function PriceListPage() {
         })}
         empty={
           <Typography.Text type="secondary">
-            {priceError
-              ? priceError
-              : (minPrice !== undefined || maxPrice !== undefined) && dataSource.length === 0
-                ? (() => {
-                    const rangeDesc = formatPriceRangeDescription(priceRange);
-                    const prefix = category
-                      ? keyword.trim()
-                        ? `${category}品类下未找到「${keyword.trim()}」且均价${rangeDesc}的菜品`
-                        : `${category}品类下未找到均价${rangeDesc}的菜品`
-                      : keyword.trim()
-                        ? `未找到「${keyword.trim()}」且均价${rangeDesc}的菜品`
-                        : `未找到均价${rangeDesc}的菜品`;
-                    return prefix;
-                  })()
-                : category && keyword.trim()
-                  ? `${category}品类下未找到「${keyword.trim()}」相关菜品`
-                  : category
-                    ? `${category}品类下暂无菜品`
+            {(minPrice !== undefined || maxPrice !== undefined) && !priceError
+              ? (() => {
+                  const rangeDesc = formatPriceRangeDescription(priceRange);
+                  return category
+                    ? keyword.trim()
+                      ? `${category}品类下未找到「${keyword.trim()}」且均价${rangeDesc}的菜品`
+                      : `${category}品类下未找到均价${rangeDesc}的菜品`
                     : keyword.trim()
-                      ? `未找到「${keyword.trim()}」相关菜品`
-                      : '暂无菜品数据'}
+                      ? `未找到「${keyword.trim()}」且均价${rangeDesc}的菜品`
+                      : `未找到均价${rangeDesc}的菜品`;
+                })()
+              : category && keyword.trim()
+                ? `${category}品类下未找到「${keyword.trim()}」相关菜品`
+                : category
+                  ? `${category}品类下暂无菜品`
+                  : keyword.trim()
+                    ? `未找到「${keyword.trim()}」相关菜品`
+                    : '暂无菜品数据'}
           </Typography.Text>
         }
       />
