@@ -1,13 +1,11 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Layout } from '@douyinfe/semi-ui';
 import { PriceListPage } from './pages/PriceListPage';
+import { RankingPage } from './pages/RankingPage';
 import { TrendPage } from './pages/TrendPage';
 
 const { Content, Footer } = Layout;
 
-/**
- * 应用路由：/ 菜价表，/item/:name 走势
- */
 export default function App() {
   return (
     <BrowserRouter>
@@ -15,6 +13,7 @@ export default function App() {
         <Content className="app-content">
           <Routes>
             <Route path="/" element={<PriceListPage />} />
+            <Route path="/排行榜" element={<RankingPage />} />
             <Route path="/item/:name" element={<TrendPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

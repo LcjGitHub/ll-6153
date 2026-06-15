@@ -55,3 +55,43 @@ export function getPriceChange(avgPrice: number, prevPrice: number): number {
 export function formatPrice(price: number): string {
   return price.toFixed(2);
 }
+
+/** 排行榜单项 */
+export interface PriceRankingItem {
+  name: string;
+  avgPrice: number;
+  change: number;
+  trend: PriceTrend;
+}
+
+/** 涨跌排行榜 */
+export interface PriceRanking {
+  topGainers: PriceRankingItem[];
+  topLosers: PriceRankingItem[];
+}
+
+/**
+ * 获取涨跌排行榜
+ * @param topN - 取前 N 名，默认 5
+ */
+export function getPriceRanking(topN = 5): PriceRanking {
+  const ranked = vegetablePrices
+    .map((item) => {
+      const change = getPriceChange(item.avgPrice, item.prevPrice);
+      const trend = getPriceTrend(item.avgPrice, item.prevPrice);
+      return { name: item.name, avgPrice: item.avgPrice, change, trend };
+    })
+    .filter((item) => item.trend !== 'flat');
+
+  const topGainers = ranked
+    .filter((item) => item.trend === 'up')
+    .sort((a, b) => b.change - a.change)
+    .slice(0, topN);
+
+  const topLosers = ranked
+    .filter((item) => item.trend === 'down')
+    .sort((a, b) => a.change - b.change)
+    .slice(0, topN);
+
+  return { topGainers, topLosers };
+}
