@@ -85,15 +85,17 @@ export function formatPriceRangeDescription(range: PriceRange): string {
  * @param category - 菜品种类，空字符串表示全部
  * @param range - 价格区间，留空一侧表示不限制
  * @param trendFilter - 涨跌方向筛选，`'all'` 表示不筛选
+ * @param list - 数据源，默认为全部菜价列表
  */
 export function filterVegetables(
   keyword: string,
   category?: string,
   range?: PriceRange,
   trendFilter?: TrendFilter,
+  list: VegetablePrice[] = vegetablePrices,
 ): VegetablePrice[] {
   const trimmed = keyword.trim();
-  let result = vegetablePrices;
+  let result = list;
 
   if (category) {
     result = result.filter((item) => item.category === category);
@@ -163,9 +165,10 @@ export interface PriceRanking {
 /**
  * 获取涨跌排行榜
  * @param topN - 取前 N 名，默认 5
+ * @param list - 数据源，默认为全部菜价列表
  */
-export function getPriceRanking(topN = 5): PriceRanking {
-  const ranked = vegetablePrices
+export function getPriceRanking(topN = 5, list: VegetablePrice[] = vegetablePrices): PriceRanking {
+  const ranked = list
     .map((item) => {
       const change = getPriceChange(item.avgPrice, item.prevPrice);
       const trend = getPriceTrend(item.avgPrice, item.prevPrice);
