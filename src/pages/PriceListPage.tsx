@@ -203,7 +203,7 @@ export function PriceListPage() {
           </div>
 
           {recentViews.length > 0 && (
-            <div className="recent-views-section" style={{ marginTop: 8 }}>
+            <div className="recent-views-section" style={{ alignSelf: 'stretch', marginTop: 4 }}>
               <Typography.Text type="secondary" size="small" style={{ marginRight: 8 }}>
                 最近浏览：
               </Typography.Text>

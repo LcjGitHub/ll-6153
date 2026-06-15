@@ -200,9 +200,9 @@ export function TrendPage() {
                 }}
               >
                 {item.name}
-                <Tag.Text type="tertiary" style={{ marginLeft: 6, fontSize: 12 }}>
+                <Typography.Text type="tertiary" style={{ marginLeft: 6, fontSize: 12 }}>
                   {dayjs(item.timestamp).format('HH:mm')}
-                </Tag.Text>
+                </Typography.Text>
               </Tag>
             ))}
           </div>
