@@ -67,17 +67,26 @@ export function PriceListPage() {
   const overviewStats = useMemo(() => getMarketOverviewStats(dataSource), [dataSource]);
 
   const renderSortIcon = (field: SortField) => {
+    const sortIconStyle: React.CSSProperties = {
+      marginLeft: 4,
+      color: 'var(--semi-color-primary)',
+    };
     if (sortState.field !== field) {
       return null;
     }
     if (sortState.order === 'asc') {
-      return <IconArrowUp size="small" style={{ marginLeft: 4 }} />;
+      return <IconArrowUp size="small" style={sortIconStyle} />;
     }
     if (sortState.order === 'desc') {
-      return <IconArrowDown size="small" style={{ marginLeft: 4 }} />;
+      return <IconArrowDown size="small" style={sortIconStyle} />;
     }
     return null;
   };
+
+  const sortableHeaderCell = (field: SortField) => ({
+    onClick: () => handleSortClick(field),
+    style: { cursor: 'pointer' as const, userSelect: 'none' as const },
+  });
 
   const columns: ColumnProps<VegetablePrice>[] = [
     {
@@ -88,16 +97,14 @@ export function PriceListPage() {
     },
     {
       title: (
-        <span
-          onClick={() => handleSortClick('avgPrice')}
-          style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', userSelect: 'none' }}
-        >
+        <span style={{ display: 'inline-flex', alignItems: 'center' }}>
           今日均价
           {renderSortIcon('avgPrice')}
         </span>
       ),
       dataIndex: 'avgPrice',
       width: 180,
+      onHeaderCell: () => sortableHeaderCell('avgPrice'),
       render: (_price: number, record: VegetablePrice) => (
         <PriceChange avgPrice={record.avgPrice} prevPrice={record.prevPrice} />
       ),
@@ -109,16 +116,14 @@ export function PriceListPage() {
     },
     {
       title: (
-        <span
-          onClick={() => handleSortClick('prevPrice')}
-          style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', userSelect: 'none' }}
-        >
+        <span style={{ display: 'inline-flex', alignItems: 'center' }}>
           昨日均价
           {renderSortIcon('prevPrice')}
         </span>
       ),
       dataIndex: 'prevPrice',
       width: 120,
+      onHeaderCell: () => sortableHeaderCell('prevPrice'),
       render: (price: number) => price.toFixed(2),
     },
   ];
