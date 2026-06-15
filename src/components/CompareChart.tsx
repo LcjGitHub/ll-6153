@@ -9,6 +9,20 @@ interface CompareChartProps {
   vegetables: VegetablePrice[];
 }
 
+/**
+ * 多菜品对比折线图（VChart）
+ *
+ * 在同一折线图中用不同颜色曲线展示多个菜品的近 7 日均价走势。
+ * 每条曲线对应一个菜品，顶部图例标明菜名，横轴为日期，纵轴为价格。
+ *
+ * @param vegetables - 要对比的菜品数据数组，每项需包含 name 和 history7d
+ *
+ * 特性说明：
+ * - 使用 seriesField 按菜名区分不同系列
+ * - 最多支持 3 种颜色（蓝、橙、绿），与选择上限保持一致
+ * - 数据点可见，hover 时显示对应菜品的价格
+ * - 横轴日期格式为 MM-DD
+ */
 export function CompareChart({ vegetables }: CompareChartProps) {
   const chartData = useMemo(() => {
     const data: Array<{ date: string; price: number; name: string }> = [];

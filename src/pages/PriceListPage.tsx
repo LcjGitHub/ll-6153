@@ -67,6 +67,9 @@ export function PriceListPage() {
           <Button onClick={() => navigate('/排行榜')}>
             查看涨跌排行榜
           </Button>
+          <Button onClick={() => navigate('/对比')}>
+            多菜品走势对比
+          </Button>
           <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
             <span style={{ fontSize: 14, color: 'var(--semi-color-text-2)', whiteSpace: 'nowrap', paddingRight: 6 }}>品类</span>
             <Select
