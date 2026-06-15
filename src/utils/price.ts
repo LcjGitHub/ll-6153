@@ -84,6 +84,7 @@ export function formatPriceRangeDescription(range: PriceRange): string {
  * @param keyword - 搜索关键词
  * @param category - 菜品种类，空字符串表示全部
  * @param range - 价格区间，留空一侧表示不限制
+ * @param trendFilter - 涨跌方向筛选，`'all'` 表示不筛选
  */
 export function filterVegetables(
   keyword: string,
@@ -191,11 +192,11 @@ export type TrendFilter = 'all' | 'up' | 'down';
 /**
  * 将涨跌方向筛选值格式化为中文可读描述
  * @param filter - 涨跌方向筛选值
- * @returns "涨价菜品"、"降价菜品" 或空字符串（全部时）
+ * @returns "涨价"、"降价" 或空字符串（全部时）
  */
 export function formatTrendFilterDescription(filter: TrendFilter): string {
-  if (filter === 'up') return '涨价菜品';
-  if (filter === 'down') return '降价菜品';
+  if (filter === 'up') return '涨价';
+  if (filter === 'down') return '降价';
   return '';
 }
 
