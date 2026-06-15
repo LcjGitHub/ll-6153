@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconArrowDown, IconArrowUp, IconSearch } from '@douyinfe/semi-icons';
-import { Button, Input, InputNumber, Select, Table, Tag, Typography } from '@douyinfe/semi-ui';
+import { Button, Input, InputNumber, Radio, Select, Table, Tag, Typography } from '@douyinfe/semi-ui';
 import type { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import dayjs from 'dayjs';
 import { PriceChange } from '../components/PriceChange';
@@ -10,12 +10,13 @@ import type { VegetableCategory, VegetablePrice } from '../types/vegetable';
 import {
   filterVegetables,
   formatPriceRangeDescription,
+  formatTrendFilterDescription,
   getMarketOverviewStats,
   getNextSortState,
   sortVegetables,
   validatePriceRange,
 } from '../utils/price';
-import type { PriceRange, SortField, SortState } from '../utils/price';
+import type { PriceRange, SortField, SortState, TrendFilter } from '../utils/price';
 import { getRecentViews } from '../utils/storage';
 import type { RecentViewItem } from '../utils/storage';
 
@@ -27,6 +28,12 @@ const CATEGORY_OPTIONS = [
   { label: '调味', value: '调味' },
 ];
 
+const TREND_FILTER_OPTIONS: { label: string; value: TrendFilter }[] = [
+  { label: '看全部', value: 'all' },
+  { label: '只看涨价', value: 'up' },
+  { label: '只看降价', value: 'down' },
+];
+
 /**
  * 今日菜价公示页
  */
@@ -34,6 +41,7 @@ export function PriceListPage() {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState<VegetableCategory | ''>('');
+  const [trendFilter, setTrendFilter] = useState<TrendFilter>('all');
   const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
   const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
   const [priceError, setPriceError] = useState<string | null>(null);
@@ -75,8 +83,8 @@ export function PriceListPage() {
   };
 
   const filtered = useMemo(
-    () => (priceError ? [] : filterVegetables(keyword, category, priceRange)),
-    [keyword, category, priceRange, priceError],
+    () => (priceError ? [] : filterVegetables(keyword, category, priceRange, trendFilter)),
+    [keyword, category, priceRange, priceError, trendFilter],
   );
   const dataSource = useMemo(() => sortVegetables(filtered, sortState), [filtered, sortState]);
   const overviewStats = useMemo(() => getMarketOverviewStats(dataSource), [dataSource]);
@@ -177,6 +185,12 @@ export function PriceListPage() {
               showClear
               style={{ width: 260 }}
             />
+            <Radio.Group
+              type="button"
+              value={trendFilter}
+              onChange={(e) => setTrendFilter(e.target.value as TrendFilter)}
+              options={TREND_FILTER_OPTIONS}
+            />
             <span style={{ fontSize: 14, color: 'var(--semi-color-text-2)', whiteSpace: 'nowrap' }}>最低价</span>
             <InputNumber
               min={0}
@@ -248,24 +262,23 @@ export function PriceListPage() {
         })}
         empty={
           <Typography.Text type="secondary">
-            {(minPrice !== undefined || maxPrice !== undefined) && !priceError
-              ? (() => {
-                  const rangeDesc = formatPriceRangeDescription(priceRange);
-                  return category
-                    ? keyword.trim()
-                      ? `${category}品类下未找到「${keyword.trim()}」且均价${rangeDesc}的菜品`
-                      : `${category}品类下未找到均价${rangeDesc}的菜品`
-                    : keyword.trim()
-                      ? `未找到「${keyword.trim()}」且均价${rangeDesc}的菜品`
-                      : `未找到均价${rangeDesc}的菜品`;
-                })()
-              : category && keyword.trim()
-                ? `${category}品类下未找到「${keyword.trim()}」相关菜品`
-                : category
-                  ? `${category}品类下暂无菜品`
-                  : keyword.trim()
-                    ? `未找到「${keyword.trim()}」相关菜品`
-                    : '暂无菜品数据'}
+            {(() => {
+              const trendDesc = formatTrendFilterDescription(trendFilter);
+              const rangeDesc =
+                (minPrice !== undefined || maxPrice !== undefined) && !priceError
+                  ? formatPriceRangeDescription(priceRange)
+                  : '';
+              const parts: string[] = [];
+              if (category) parts.push(`${category}品类下`);
+              const conditions: string[] = [];
+              if (keyword.trim()) conditions.push(`「${keyword.trim()}」`);
+              if (trendDesc) conditions.push(trendDesc);
+              if (rangeDesc) conditions.push(`均价${rangeDesc}`);
+              const condStr = conditions.length > 0 ? conditions.join('且') : '';
+              if (parts.length === 0 && condStr === '') return '暂无菜品数据';
+              if (condStr === '') return `${parts.join('')}暂无菜品`;
+              return `${parts.join('')}未找到${condStr}的菜品`;
+            })()}
           </Typography.Text>
         }
       />

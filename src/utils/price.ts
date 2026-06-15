@@ -85,7 +85,12 @@ export function formatPriceRangeDescription(range: PriceRange): string {
  * @param category - 菜品种类，空字符串表示全部
  * @param range - 价格区间，留空一侧表示不限制
  */
-export function filterVegetables(keyword: string, category?: string, range?: PriceRange): VegetablePrice[] {
+export function filterVegetables(
+  keyword: string,
+  category?: string,
+  range?: PriceRange,
+  trendFilter?: TrendFilter,
+): VegetablePrice[] {
   const trimmed = keyword.trim();
   let result = vegetablePrices;
 
@@ -93,10 +98,12 @@ export function filterVegetables(keyword: string, category?: string, range?: Pri
     result = result.filter((item) => item.category === category);
   }
 
-  if (!trimmed) {
-    result = result.filter(() => true);
-  } else {
+  if (trimmed) {
     result = result.filter((item) => item.name.includes(trimmed));
+  }
+
+  if (trendFilter && trendFilter !== 'all') {
+    result = result.filter((item) => getPriceTrend(item.avgPrice, item.prevPrice) === trendFilter);
   }
 
   if (range && (range.min !== undefined || range.max !== undefined)) {
@@ -176,6 +183,20 @@ export function getPriceRanking(topN = 5): PriceRanking {
     .slice(0, topN);
 
   return { topGainers, topLosers };
+}
+
+/** 涨跌方向筛选 */
+export type TrendFilter = 'all' | 'up' | 'down';
+
+/**
+ * 将涨跌方向筛选值格式化为中文可读描述
+ * @param filter - 涨跌方向筛选值
+ * @returns "涨价菜品"、"降价菜品" 或空字符串（全部时）
+ */
+export function formatTrendFilterDescription(filter: TrendFilter): string {
+  if (filter === 'up') return '涨价菜品';
+  if (filter === 'down') return '降价菜品';
+  return '';
 }
 
 /** 排序字段 */
