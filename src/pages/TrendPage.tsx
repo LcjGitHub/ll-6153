@@ -173,11 +173,10 @@ export function TrendPage() {
         </div>
       </Card>
 
-      <Card
-        headerExtraContent={
+      <Card style={{ position: 'relative' }}>
+        <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 1 }}>
           <ChartExportButton chartRef={chartRef} dishName={vegetable.name} />
-        }
-      >
+        </div>
         <TrendChart
           ref={chartRef}
           name={vegetable.name}

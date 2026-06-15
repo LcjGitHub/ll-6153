@@ -10,6 +10,15 @@ interface ChartExportButtonProps {
   dishName: string;
 }
 
+/**
+ * 图表导出按钮
+ *
+ * 点击后将当前 VChart 图表导出为 PNG 图片并触发浏览器下载。
+ * 文件名格式为「{菜名}_走势_{当天日期}」，例如：西红柿_走势_2026-06-15。
+ *
+ * @param chartRef - VChart 实例的 ref，用于调用 exportImg 方法
+ * @param dishName - 菜品名称，用于拼接导出文件名
+ */
 export function ChartExportButton({ chartRef, dishName }: ChartExportButtonProps) {
   const [exporting, setExporting] = useState(false);
 
