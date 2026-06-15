@@ -1,0 +1,86 @@
+:root {
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  line-height: 1.5;
+  color: var(--semi-color-text-0);
+  background: var(--semi-color-bg-0);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-layout {
+  min-height: 100vh;
+  background: var(--semi-color-bg-1);
+}
+
+.app-content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 32px;
+  width: 100%;
+}
+
+.app-footer {
+  text-align: center;
+  color: var(--semi-color-text-2);
+  font-size: 12px;
+  padding: 16px;
+  border-top: 1px solid var(--semi-color-border);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.page-header-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.page-hint {
+  text-align: center;
+  display: block;
+}
+
+.summary-card .semi-card-body {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@media (max-width: 640px) {
+  .page-header {
+    flex-direction: column;
+  }
+
+  .page-header .semi-input-wrapper {
+    width: 100% !important;
+  }
+}
