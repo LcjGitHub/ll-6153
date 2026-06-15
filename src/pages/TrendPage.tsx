@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { IconArrowLeft } from '@douyinfe/semi-icons';
 import { Button, Card, Empty, Typography } from '@douyinfe/semi-ui';
@@ -17,17 +17,59 @@ export function TrendPage() {
 
   const vegetable = useMemo(() => findVegetableByName(name), [name]);
   const allNames = useMemo(() => getAllVegetableNames(), []);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const activeName = vegetable?.name ?? name;
 
   const handleVegetableClick = (targetName: string) => {
+    if (targetName === activeName) {
+      return;
+    }
     navigate(`/item/${encodeURIComponent(targetName)}`);
   };
+
+  useEffect(() => {
+    const scrollEl = scrollRef.current;
+    if (!scrollEl || !activeName) {
+      return;
+    }
+    const activeEl = scrollEl.querySelector<HTMLButtonElement>(
+      `[data-name="${activeName}"]`,
+    );
+    if (activeEl) {
+      const containerWidth = scrollEl.clientWidth;
+      const elLeft = activeEl.offsetLeft;
+      const elWidth = activeEl.offsetWidth;
+      scrollEl.scrollTo({
+        left: elLeft - containerWidth / 2 + elWidth / 2,
+        behavior: 'smooth',
+      });
+    }
+  }, [activeName]);
+
+  const switcher = (
+    <div className="vegetable-switcher">
+      <div className="vegetable-switcher-scroll" ref={scrollRef}>
+        {allNames.map((itemName) => (
+          <button
+            key={itemName}
+            data-name={itemName}
+            className={`vegetable-switcher-item${itemName === activeName ? ' active' : ''}`}
+            onClick={() => handleVegetableClick(itemName)}
+            type="button"
+          >
+            {itemName}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 
   if (!vegetable) {
     return (
       <div className="page">
         <Empty
           title="未找到该菜品"
-          description={`「${name}」不在 Mock 菜价列表中`}
+          description={`「${name}」不在 Mock 菜价列表中，请选择其他菜品查看`}
         >
           <Link to="/">
             <Button theme="solid" type="primary">
@@ -35,6 +77,7 @@ export function TrendPage() {
             </Button>
           </Link>
         </Empty>
+        {switcher}
       </div>
     );
   }
@@ -59,20 +102,7 @@ export function TrendPage() {
         </div>
       </header>
 
-      <div className="vegetable-switcher">
-        <div className="vegetable-switcher-scroll">
-          {allNames.map((itemName) => (
-            <button
-              key={itemName}
-              className={`vegetable-switcher-item${itemName === vegetable.name ? ' active' : ''}`}
-              onClick={() => handleVegetableClick(itemName)}
-              type="button"
-            >
-              {itemName}
-            </button>
-          ))}
-        </div>
-      </div>
+      {switcher}
 
       <Card className="summary-card">
         <div className="summary-item">

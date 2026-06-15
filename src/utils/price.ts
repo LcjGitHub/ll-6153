@@ -14,6 +14,7 @@ export function findVegetableByName(name: string): VegetablePrice | undefined {
 
 /**
  * 获取全部菜名列表（按菜名拼音/汉字顺序排序）
+ * @returns 排序后的菜名数组
  */
 export function getAllVegetableNames(): string[] {
   return vegetablePrices
