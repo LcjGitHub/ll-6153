@@ -5,9 +5,11 @@ import { Button, Card, Empty, Tag, Typography } from '@douyinfe/semi-ui';
 import dayjs from 'dayjs';
 import { TrendChart } from '../components/TrendChart';
 import { PriceChange } from '../components/PriceChange';
+import { ChartExportButton } from '../components/ChartExportButton';
 import { findVegetableByName, getAllVegetableNames } from '../utils/price';
 import { getRecentViews, saveRecentView } from '../utils/storage';
 import type { RecentViewItem } from '../utils/storage';
+import type { VChart as VChartType } from '@visactor/vchart';
 
 /**
  * 单品 7 日走势页
@@ -20,6 +22,7 @@ export function TrendPage() {
   const vegetable = useMemo(() => findVegetableByName(name), [name]);
   const allNames = useMemo(() => getAllVegetableNames(), []);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<VChartType | null>(null);
   const activeName = vegetable?.name ?? name;
   const [recentViews, setRecentViews] = useState<RecentViewItem[]>([]);
 
@@ -170,8 +173,13 @@ export function TrendPage() {
         </div>
       </Card>
 
-      <Card>
+      <Card
+        headerExtraContent={
+          <ChartExportButton chartRef={chartRef} dishName={vegetable.name} />
+        }
+      >
         <TrendChart
+          ref={chartRef}
           name={vegetable.name}
           unit={vegetable.unit}
           history7d={vegetable.history7d}

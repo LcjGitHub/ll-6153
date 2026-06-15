@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { forwardRef, useMemo } from 'react';
 import { LineChart } from '@visactor/react-vchart';
 import dayjs from 'dayjs';
 import type { PriceHistoryPoint } from '../types/vegetable';
+import type { VChart as VChartType } from '@visactor/vchart';
 
 interface TrendChartProps {
   name: string;
@@ -12,7 +13,8 @@ interface TrendChartProps {
 /**
  * 7 日均价折线图（VChart）
  */
-export function TrendChart({ name, unit, history7d }: TrendChartProps) {
+export const TrendChart = forwardRef<VChartType | null, TrendChartProps>(
+  function TrendChart({ name, unit, history7d }, ref) {
   const chartData = useMemo(
     () =>
       history7d.map((point) => ({
@@ -67,7 +69,7 @@ export function TrendChart({ name, unit, history7d }: TrendChartProps) {
 
   return (
     <div style={{ width: '100%', height: 420 }}>
-      <LineChart spec={spec} />
+      <LineChart ref={ref} spec={spec} />
     </div>
   );
-}
+});
