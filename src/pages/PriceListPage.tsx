@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconSearch } from '@douyinfe/semi-icons';
-import { Input, Table, Typography } from '@douyinfe/semi-ui';
+import { Button, Input, Table, Typography } from '@douyinfe/semi-ui';
 import type { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import dayjs from 'dayjs';
 import { PriceChange } from '../components/PriceChange';
@@ -54,14 +54,19 @@ export function PriceListPage() {
             数据日期：{dayjs().format('YYYY-MM-DD')} · Mock 数据，仅供参考
           </Typography.Text>
         </div>
-        <Input
-          prefix={<IconSearch />}
-          placeholder="按菜名搜索"
-          value={keyword}
-          onChange={setKeyword}
-          showClear
-          style={{ width: 260 }}
-        />
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <Button onClick={() => navigate('/排行榜')}>
+            查看涨跌排行榜
+          </Button>
+          <Input
+            prefix={<IconSearch />}
+            placeholder="按菜名搜索"
+            value={keyword}
+            onChange={setKeyword}
+            showClear
+            style={{ width: 260 }}
+          />
+        </div>
       </header>
 
       <Table

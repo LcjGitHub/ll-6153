@@ -22,40 +22,23 @@ function RankingTable({
 
   const columns: ColumnProps<PriceRankingItem>[] = [
     {
-      title: '排名',
-      width: 70,
-      render: (_v: unknown, _r: PriceRankingItem, index: number) => (
-        <Typography.Text strong>{index + 1}</Typography.Text>
-      ),
-    },
-    {
       title: '菜名',
       dataIndex: 'name',
-      width: 120,
       render: (name: string) => <Typography.Text strong>{name}</Typography.Text>,
     },
     {
       title: '今日均价（元/斤）',
       dataIndex: 'avgPrice',
-      width: 160,
       render: (price: number) => formatPrice(price),
     },
     {
       title: '涨跌金额（元）',
       dataIndex: 'change',
-      width: 150,
       render: (change: number) => (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: trendColor }}>
           <Icon size="small" />
           {Math.abs(change).toFixed(2)}
         </span>
-      ),
-    },
-    {
-      title: '方向',
-      width: 80,
-      render: () => (
-        <Icon style={{ color: trendColor }} size="default" />
       ),
     },
   ];
@@ -82,21 +65,19 @@ export function RankingPage() {
 
   return (
     <div className="page">
-      <header className="page-header">
-        <div className="page-header-row">
-          <Button
-            icon={<IconArrowLeft />}
-            theme="borderless"
-            onClick={() => navigate('/')}
-          >
-            返回菜价表
-          </Button>
-          <div>
-            <Typography.Title heading={3}>菜价涨跌排行榜</Typography.Title>
-            <Typography.Text type="secondary">
-              今日相对昨日涨跌幅度排行 · 更新至 {dayjs().format('YYYY-MM-DD')}
-            </Typography.Text>
-          </div>
+      <header className="page-header" style={{ flexDirection: 'column', alignItems: 'flex-start', gap: 12 }}>
+        <Button
+          icon={<IconArrowLeft />}
+          theme="borderless"
+          onClick={() => navigate('/')}
+        >
+          返回菜价表
+        </Button>
+        <div>
+          <Typography.Title heading={3}>菜价涨跌排行榜</Typography.Title>
+          <Typography.Text type="secondary">
+            今日相对昨日涨跌幅度排行 · 更新至 {dayjs().format('YYYY-MM-DD')}
+          </Typography.Text>
         </div>
       </header>
 
