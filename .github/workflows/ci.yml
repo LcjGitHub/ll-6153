@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: 安装依赖
+        run: npm ci
+
+      - name: 代码规范检查
+        id: lint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: 类型检查
+        id: typecheck
+        run: npx tsc --noEmit
+        continue-on-error: true
+
+      - name: 生产构建
+        id: build
+        run: npm run build
+        continue-on-error: true
+
+      - name: 结果汇总
+        if: always()
+        run: |
+          HAS_FAILURE=false
+          echo "========================================"
+          if [ "${{ steps.lint.outcome }}" = "failure" ] || [ "${{ steps.typecheck.outcome }}" = "failure" ] || [ "${{ steps.build.outcome }}" = "failure" ]; then
+            echo "❌ CI 流水线执行失败"
+            HAS_FAILURE=true
+          else
+            echo "✅ CI 流水线执行成功"
+          fi
+          echo "========================================"
+          echo ""
+          echo "步骤执行结果："
+          echo ""
+          if [ "${{ steps.lint.outcome }}" = "success" ]; then
+            echo "  🟢 代码规范检查 (lint) - 通过"
+          elif [ "${{ steps.lint.outcome }}" = "failure" ]; then
+            echo "  🔴 代码规范检查 (lint) - 失败"
+            echo "     请运行 'npm run lint' 查看详细错误，并修复代码规范问题。"
+            HAS_FAILURE=true
+          else
+            echo "  ⚪ 代码规范检查 (lint) - 跳过"
+          fi
+          echo ""
+          if [ "${{ steps.typecheck.outcome }}" = "success" ]; then
+            echo "  🟢 类型检查 (typecheck) - 通过"
+          elif [ "${{ steps.typecheck.outcome }}" = "failure" ]; then
+            echo "  🔴 类型检查 (typecheck) - 失败"
+            echo "     请运行 'npx tsc --noEmit' 查看详细错误，并修复类型问题。"
+            HAS_FAILURE=true
+          else
+            echo "  ⚪ 类型检查 (typecheck) - 跳过"
+          fi
+          echo ""
+          if [ "${{ steps.build.outcome }}" = "success" ]; then
+            echo "  🟢 生产构建 (build) - 通过"
+          elif [ "${{ steps.build.outcome }}" = "failure" ]; then
+            echo "  🔴 生产构建 (build) - 失败"
+            echo "     请运行 'npm run build' 查看详细错误，并修复构建问题。"
+            HAS_FAILURE=true
+          else
+            echo "  ⚪ 生产构建 (build) - 跳过"
+          fi
+          echo ""
+          echo "========================================"
+          if [ "$HAS_FAILURE" = true ]; then
+            echo "💡 修复建议："
+            echo "   1. 在本地运行相应命令复现问题"
+            echo "   2. 修复所有错误后再次提交"
+            echo "   3. 如有疑问，请查看上方详细日志"
+            echo "========================================"
+            exit 1
+          fi
+          echo "🎉 所有检查均已通过！"
+          echo "========================================"
