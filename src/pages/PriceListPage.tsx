@@ -67,20 +67,23 @@ export function PriceListPage() {
           <Button onClick={() => navigate('/排行榜')}>
             查看涨跌排行榜
           </Button>
-          <Select
-            value={category}
-            onChange={(value) => setCategory(value as VegetableCategory | '')}
-            optionList={CATEGORY_OPTIONS}
-            style={{ width: 120 }}
-          />
-          <Input
-            prefix={<IconSearch />}
-            placeholder="按菜名搜索"
-            value={keyword}
-            onChange={setKeyword}
-            showClear
-            style={{ width: 260 }}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: 0 }}>
+            <span style={{ fontSize: 14, color: 'var(--semi-color-text-2)', whiteSpace: 'nowrap', paddingRight: 6 }}>品类</span>
+            <Select
+              value={category}
+              onChange={(value) => setCategory(value as VegetableCategory | '')}
+              optionList={CATEGORY_OPTIONS}
+              style={{ width: 120 }}
+            />
+            <Input
+              prefix={<IconSearch />}
+              placeholder="按菜名搜索"
+              value={keyword}
+              onChange={setKeyword}
+              showClear
+              style={{ width: 260 }}
+            />
+          </div>
         </div>
       </header>
 
@@ -99,7 +102,13 @@ export function PriceListPage() {
         })}
         empty={
           <Typography.Text type="secondary">
-            未找到「{keyword}」相关菜品
+            {category && keyword.trim()
+              ? `${category}品类下未找到「${keyword.trim()}」相关菜品`
+              : category
+                ? `${category}品类下暂无菜品`
+                : keyword.trim()
+                  ? `未找到「${keyword.trim()}」相关菜品`
+                  : '暂无菜品数据'}
           </Typography.Text>
         }
       />
