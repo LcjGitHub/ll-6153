@@ -1,14 +1,21 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IconSearch } from '@douyinfe/semi-icons';
+import { IconArrowDown, IconArrowUp, IconSearch } from '@douyinfe/semi-icons';
 import { Button, Input, InputNumber, Select, Table, Typography } from '@douyinfe/semi-ui';
 import type { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import dayjs from 'dayjs';
 import { PriceChange } from '../components/PriceChange';
 import { MarketOverview } from '../components/MarketOverview';
 import type { VegetableCategory, VegetablePrice } from '../types/vegetable';
-import { filterVegetables, formatPriceRangeDescription, getMarketOverviewStats, validatePriceRange } from '../utils/price';
-import type { PriceRange } from '../utils/price';
+import {
+  filterVegetables,
+  formatPriceRangeDescription,
+  getMarketOverviewStats,
+  getNextSortState,
+  sortVegetables,
+  validatePriceRange,
+} from '../utils/price';
+import type { PriceRange, SortField, SortState } from '../utils/price';
 
 const CATEGORY_OPTIONS = [
   { label: '全部', value: '' },
@@ -28,8 +35,13 @@ export function PriceListPage() {
   const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
   const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
   const [priceError, setPriceError] = useState<string | null>(null);
+  const [sortState, setSortState] = useState<SortState>({ field: null, order: null });
 
   const priceRange: PriceRange = { min: minPrice, max: maxPrice };
+
+  const handleSortClick = (field: SortField) => {
+    setSortState((prev) => getNextSortState(prev, field));
+  };
 
   const handleMinPriceChange = (value: number | string | null | undefined) => {
     const num = value === null || value === undefined || value === '' ? undefined : Number(value);
@@ -47,11 +59,25 @@ export function PriceListPage() {
     setMaxPrice(num);
   };
 
-  const dataSource = useMemo(
+  const filtered = useMemo(
     () => (priceError ? [] : filterVegetables(keyword, category, priceRange)),
     [keyword, category, priceRange, priceError],
   );
+  const dataSource = useMemo(() => sortVegetables(filtered, sortState), [filtered, sortState]);
   const overviewStats = useMemo(() => getMarketOverviewStats(dataSource), [dataSource]);
+
+  const renderSortIcon = (field: SortField) => {
+    if (sortState.field !== field) {
+      return null;
+    }
+    if (sortState.order === 'asc') {
+      return <IconArrowUp size="small" style={{ marginLeft: 4 }} />;
+    }
+    if (sortState.order === 'desc') {
+      return <IconArrowDown size="small" style={{ marginLeft: 4 }} />;
+    }
+    return null;
+  };
 
   const columns: ColumnProps<VegetablePrice>[] = [
     {
@@ -61,7 +87,15 @@ export function PriceListPage() {
       render: (name: string) => <Typography.Text strong>{name}</Typography.Text>,
     },
     {
-      title: '今日均价',
+      title: (
+        <span
+          onClick={() => handleSortClick('avgPrice')}
+          style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', userSelect: 'none' }}
+        >
+          今日均价
+          {renderSortIcon('avgPrice')}
+        </span>
+      ),
       dataIndex: 'avgPrice',
       width: 180,
       render: (_price: number, record: VegetablePrice) => (
@@ -74,7 +108,15 @@ export function PriceListPage() {
       width: 100,
     },
     {
-      title: '昨日均价',
+      title: (
+        <span
+          onClick={() => handleSortClick('prevPrice')}
+          style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', userSelect: 'none' }}
+        >
+          昨日均价
+          {renderSortIcon('prevPrice')}
+        </span>
+      ),
       dataIndex: 'prevPrice',
       width: 120,
       render: (price: number) => price.toFixed(2),

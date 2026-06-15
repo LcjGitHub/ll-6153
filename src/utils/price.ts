@@ -168,6 +168,56 @@ export function getPriceRanking(topN = 5): PriceRanking {
   return { topGainers, topLosers };
 }
 
+/** 排序字段 */
+export type SortField = 'avgPrice' | 'prevPrice';
+
+/** 排序方向 */
+export type SortOrder = 'asc' | 'desc';
+
+/** 排序状态 */
+export interface SortState {
+  field: SortField | null;
+  order: SortOrder | null;
+}
+
+/**
+ * 按指定字段和方向对菜价列表排序
+ * @param list - 菜价列表
+ * @param sortState - 排序状态，field 或 order 为 null 时返回原列表
+ */
+export function sortVegetables(
+  list: VegetablePrice[],
+  sortState: SortState,
+): VegetablePrice[] {
+  const { field, order } = sortState;
+  if (!field || !order) {
+    return list;
+  }
+  const sorted = [...list].sort((a, b) => {
+    const diff = a[field] - b[field];
+    return order === 'asc' ? diff : -diff;
+  });
+  return sorted;
+}
+
+/**
+ * 获取下一个排序状态（默认 → 升序 → 降序 → 默认 循环）
+ * @param current - 当前排序状态
+ * @param targetField - 点击的目标排序字段
+ */
+export function getNextSortState(current: SortState, targetField: SortField): SortState {
+  if (current.field !== targetField) {
+    return { field: targetField, order: 'asc' };
+  }
+  if (current.order === null) {
+    return { field: targetField, order: 'asc' };
+  }
+  if (current.order === 'asc') {
+    return { field: targetField, order: 'desc' };
+  }
+  return { field: null, order: null };
+}
+
 /** 市场概览统计 */
 export interface MarketOverviewStats {
   upCount: number;
