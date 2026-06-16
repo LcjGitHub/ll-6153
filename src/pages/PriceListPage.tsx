@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconArrowDown, IconArrowUp, IconHistogram, IconStar, IconStarStroked } from '@douyinfe/semi-icons';
-import { Table, Typography, Button, Tag } from '@douyinfe/semi-ui';
+import { Table, Typography, Button, Tag, Toast } from '@douyinfe/semi-ui';
 import type { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import dayjs from 'dayjs';
 import { FilterBar } from '../components/FilterBar';
@@ -22,6 +22,7 @@ import type { PriceRange, SortField, SortState, TrendFilter } from '../utils/pri
 import { getRecentViews, getFavorites, toggleFavorite, FAVORITES_CHANGED_EVENT } from '../utils/storage';
 import type { RecentViewItem } from '../utils/storage';
 import type { FilterPreset } from '../utils/filterPreset';
+import { quickSaveOverviewPreset } from '../utils/filterPreset';
 
 const CATEGORY_TAG_COLOR: Record<VegetableCategory, string> = {
   叶菜: 'green',
@@ -105,6 +106,17 @@ export function PriceListPage() {
     setPriceError(error);
     setMinPrice(nextMin);
     setMaxPrice(nextMax);
+  };
+
+  const handleOverviewSavePreset = () => {
+    const result = quickSaveOverviewPreset({
+      keyword,
+      category,
+      trendFilter,
+      minPrice,
+      maxPrice,
+    });
+    Toast.success(`方案「${result.name}」已保存`);
   };
 
   const filtered = useMemo(
@@ -264,7 +276,7 @@ export function PriceListPage() {
         <Typography.Title heading={5} style={{ marginBottom: 12 }}>
           今日市场概览
         </Typography.Title>
-        <MarketOverview stats={overviewStats} />
+        <MarketOverview stats={overviewStats} onSavePreset={handleOverviewSavePreset} />
       </section>
 
       <Table

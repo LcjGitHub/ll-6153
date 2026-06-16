@@ -9,6 +9,7 @@ import {
   deleteFilterPreset,
   getFilterPresets,
   isPresetNameExists,
+  PRESET_CHANGED_EVENT,
   saveFilterPreset,
 } from '../utils/filterPreset';
 import type { FilterPreset } from '../utils/filterPreset';
@@ -39,11 +40,14 @@ export function FilterPresetSelector(props: FilterPresetSelectorProps) {
     refreshPresets();
     const handleStorage = () => refreshPresets();
     const handleFocus = () => refreshPresets();
+    const handlePresetChanged = () => refreshPresets();
     window.addEventListener('storage', handleStorage);
     window.addEventListener('focus', handleFocus);
+    window.addEventListener(PRESET_CHANGED_EVENT, handlePresetChanged);
     return () => {
       window.removeEventListener('storage', handleStorage);
       window.removeEventListener('focus', handleFocus);
+      window.removeEventListener(PRESET_CHANGED_EVENT, handlePresetChanged);
     };
   }, []);
 

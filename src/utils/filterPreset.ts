@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import type { VegetableCategory } from '../types/vegetable';
 import type { TrendFilter } from './price';
 
@@ -14,6 +15,8 @@ export interface FilterPreset {
   maxPrice: number | undefined;
   createdAt: number;
 }
+
+export const PRESET_CHANGED_EVENT = 'vegetable_preset_changed';
 
 /** localStorage 存储键名 */
 const PRESETS_KEY = 'vegetable_filter_presets';
@@ -89,4 +92,13 @@ export function deleteFilterPreset(id: string): void {
 export function isPresetNameExists(name: string, excludeId?: string): boolean {
   const presets = getFilterPresets();
   return presets.some((p) => p.name === name && p.id !== excludeId);
+}
+
+export function quickSaveOverviewPreset(
+  filters: Omit<FilterPreset, 'id' | 'createdAt' | 'name'>,
+): FilterPreset {
+  const name = `概览${dayjs().format('YYYY-MM-DD')}`;
+  const result = saveFilterPreset({ name, ...filters });
+  window.dispatchEvent(new CustomEvent(PRESET_CHANGED_EVENT));
+  return result;
 }

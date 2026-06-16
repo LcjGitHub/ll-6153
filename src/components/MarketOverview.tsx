@@ -4,6 +4,7 @@ import type { MarketOverviewStats } from '../utils/price';
 
 interface MarketOverviewProps {
   stats: MarketOverviewStats;
+  onSavePreset?: () => void;
 }
 
 const cardStyle = {
@@ -36,7 +37,7 @@ const iconWrapperStyle = (color: string) => ({
  * 卡片采用响应式弹性布局，窄屏下会自动换行，
  * 数据随传入的 stats 联动更新。
  */
-export function MarketOverview({ stats }: MarketOverviewProps) {
+export function MarketOverview({ stats, onSavePreset }: MarketOverviewProps) {
   const { upCount, downCount, flatCount, avgPrice } = stats;
 
   const cards = [
@@ -107,6 +108,16 @@ export function MarketOverview({ stats }: MarketOverviewProps) {
                     {card.unit}
                   </Typography.Text>
                 </div>
+                {onSavePreset && (
+                  <Typography.Text
+                    link={{
+                      onClick: onSavePreset,
+                    }}
+                    style={{ fontSize: 12, marginTop: 2 }}
+                  >
+                    保存为方案
+                  </Typography.Text>
+                )}
               </div>
             </div>
           </Card>
