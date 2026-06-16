@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconArrowDown, IconArrowUp, IconHistogram, IconStar, IconStarStroked } from '@douyinfe/semi-icons';
-import { Table, Typography, Button } from '@douyinfe/semi-ui';
+import { Table, Typography, Button, Tag } from '@douyinfe/semi-ui';
 import type { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import dayjs from 'dayjs';
 import { FilterBar } from '../components/FilterBar';
@@ -22,6 +22,13 @@ import type { PriceRange, SortField, SortState, TrendFilter } from '../utils/pri
 import { getRecentViews, getFavorites, toggleFavorite, FAVORITES_CHANGED_EVENT } from '../utils/storage';
 import type { RecentViewItem } from '../utils/storage';
 import type { FilterPreset } from '../utils/filterPreset';
+
+const CATEGORY_TAG_COLOR: Record<VegetableCategory, string> = {
+  叶菜: 'green',
+  根茎: 'orange',
+  瓜果: 'violet',
+  调味: 'cyan',
+};
 
 export function PriceListPage() {
   const navigate = useNavigate();
@@ -135,6 +142,23 @@ export function PriceListPage() {
       dataIndex: 'name',
       width: 140,
       render: (name: string) => <Typography.Text strong>{name}</Typography.Text>,
+    },
+    {
+      title: '品类',
+      dataIndex: 'category',
+      width: 90,
+      render: (cat: VegetableCategory) => (
+        <Tag
+          color={CATEGORY_TAG_COLOR[cat]}
+          style={{ cursor: 'pointer' }}
+          onClick={(e: React.MouseEvent) => {
+            e.stopPropagation();
+            setCategory(cat);
+          }}
+        >
+          {cat}
+        </Tag>
+      ),
     },
     {
       title: (
