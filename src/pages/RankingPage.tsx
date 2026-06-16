@@ -12,11 +12,13 @@ function RankingTable({
   data,
   trendIcon,
   trendColor,
+  onRowClick,
 }: {
   title: string;
   data: PriceRankingItem[];
   trendIcon: 'up' | 'down';
   trendColor: string;
+  onRowClick: (name: string) => void;
 }) {
   const Icon = trendIcon === 'up' ? IconArrowUp : IconArrowDown;
 
@@ -54,6 +56,14 @@ function RankingTable({
         rowKey="name"
         pagination={false}
         size="small"
+        className="ranking-clickable-table"
+        onRow={(record) => ({
+          onClick: () => {
+            if (record?.name) {
+              onRowClick(record.name);
+            }
+          },
+        })}
       />
     </div>
   );
@@ -62,6 +72,10 @@ function RankingTable({
 export function RankingPage() {
   const navigate = useNavigate();
   const { topGainers, topLosers } = useMemo(() => getPriceRanking(5), []);
+
+  const handleRowClick = (name: string) => {
+    navigate(`/item/${encodeURIComponent(name)}`);
+  };
 
   return (
     <div className="page">
@@ -86,6 +100,7 @@ export function RankingPage() {
         data={topGainers}
         trendIcon="up"
         trendColor="var(--semi-color-danger)"
+        onRowClick={handleRowClick}
       />
 
       <RankingTable
@@ -93,6 +108,7 @@ export function RankingPage() {
         data={topLosers}
         trendIcon="down"
         trendColor="var(--semi-color-success)"
+        onRowClick={handleRowClick}
       />
     </div>
   );

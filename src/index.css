@@ -141,6 +141,15 @@ body {
   font-weight: 500;
 }
 
+.ranking-clickable-table .semi-table-tbody .semi-table-row {
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ranking-clickable-table .semi-table-tbody .semi-table-row:hover {
+  background-color: var(--semi-color-fill-0);
+}
+
 @media (max-width: 640px) {
   .page-header {
     flex-direction: column;
