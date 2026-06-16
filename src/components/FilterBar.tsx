@@ -1,4 +1,4 @@
-import { IconSearch } from '@douyinfe/semi-icons';
+import { IconSearch, IconStar } from '@douyinfe/semi-icons';
 import { Button, Input, InputNumber, Radio, Select, Tag, Typography } from '@douyinfe/semi-ui';
 import dayjs from 'dayjs';
 import type { VegetableCategory } from '../types/vegetable';
@@ -32,6 +32,7 @@ export interface FilterBarProps {
   onMaxPriceChange: (value: number | string | null | undefined) => void;
   priceError: string | null;
   recentViews: RecentViewItem[];
+  favorites: string[];
   onNavigate: (path: string) => void;
   presetSelector?: React.ReactNode;
 }
@@ -49,6 +50,7 @@ export function FilterBar({
   onMaxPriceChange,
   priceError,
   recentViews,
+  favorites,
   onNavigate,
   presetSelector,
 }: FilterBarProps) {
@@ -123,6 +125,9 @@ export function FilterBar({
               style={{ cursor: 'pointer', marginBottom: 4 }}
               onClick={() => onNavigate(`/item/${encodeURIComponent(item.name)}`)}
             >
+              {favorites.includes(item.name) && (
+                <IconStar style={{ color: '#F7BA1E', marginRight: 2 }} size="small" />
+              )}
               {item.name}
               <Typography.Text type="tertiary" style={{ marginLeft: 4, fontSize: 11 }}>
                 {dayjs(item.timestamp).format('HH:mm')}

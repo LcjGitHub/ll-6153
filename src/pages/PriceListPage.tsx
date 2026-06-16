@@ -19,7 +19,7 @@ import {
   validatePriceRange,
 } from '../utils/price';
 import type { PriceRange, SortField, SortState, TrendFilter } from '../utils/price';
-import { getRecentViews, getFavorites, toggleFavorite } from '../utils/storage';
+import { getRecentViews, getFavorites, toggleFavorite, FAVORITES_CHANGED_EVENT } from '../utils/storage';
 import type { RecentViewItem } from '../utils/storage';
 import type { FilterPreset } from '../utils/filterPreset';
 
@@ -50,11 +50,14 @@ export function PriceListPage() {
       setRecentViews(getRecentViews());
       refreshFavorites();
     };
+    const handleFavoritesChanged = () => refreshFavorites();
     window.addEventListener('storage', handleStorage);
     window.addEventListener('focus', handleFocus);
+    window.addEventListener(FAVORITES_CHANGED_EVENT, handleFavoritesChanged);
     return () => {
       window.removeEventListener('storage', handleStorage);
       window.removeEventListener('focus', handleFocus);
+      window.removeEventListener(FAVORITES_CHANGED_EVENT, handleFavoritesChanged);
     };
   }, []);
 
@@ -218,6 +221,7 @@ export function PriceListPage() {
           onMaxPriceChange={handleMaxPriceChange}
           priceError={priceError}
           recentViews={recentViews}
+          favorites={favorites}
           onNavigate={navigate}
           presetSelector={
             <FilterPresetSelector

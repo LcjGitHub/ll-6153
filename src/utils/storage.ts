@@ -61,6 +61,12 @@ export function clearRecentViews(): void {
   }
 }
 
+export const FAVORITES_CHANGED_EVENT = 'vegetable_favorites_changed';
+
+export function emitFavoritesChanged(): void {
+  window.dispatchEvent(new CustomEvent(FAVORITES_CHANGED_EVENT));
+}
+
 /** 收藏存储键名 */
 const FAVORITES_KEY = 'vegetable_favorites';
 
@@ -97,6 +103,7 @@ export function toggleFavorite(name: string): boolean {
       updated = [...favorites, name];
     }
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+    emitFavoritesChanged();
     return !exists;
   } catch (e) {
     console.error('切换收藏状态失败:', e);
@@ -122,6 +129,7 @@ export function removeFavorite(name: string): void {
     const favorites = getFavorites();
     const updated = favorites.filter((item) => item !== name);
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+    emitFavoritesChanged();
   } catch (e) {
     console.error('移除收藏失败:', e);
   }

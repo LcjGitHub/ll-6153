@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { IconArrowLeft } from '@douyinfe/semi-icons';
+import { IconArrowLeft, IconStar, IconStarStroked } from '@douyinfe/semi-icons';
 import { Button, Card, Empty, Tag, Typography } from '@douyinfe/semi-ui';
 import dayjs from 'dayjs';
 import { TrendChart } from '../components/TrendChart';
 import { PriceChange } from '../components/PriceChange';
 import { ChartExportButton } from '../components/ChartExportButton';
 import { findVegetableByName, getAllVegetableNames } from '../utils/price';
-import { getRecentViews, saveRecentView } from '../utils/storage';
+import { FAVORITES_CHANGED_EVENT, getFavorites, getRecentViews, saveRecentView, toggleFavorite } from '../utils/storage';
 import type { RecentViewItem } from '../utils/storage';
 import type { VChart as VChartType } from '@visactor/vchart';
 
@@ -25,12 +25,22 @@ export function TrendPage() {
   const chartRef = useRef<VChartType | null>(null);
   const activeName = vegetable?.name ?? name;
   const [recentViews, setRecentViews] = useState<RecentViewItem[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
+
+  const refreshFavorites = () => setFavorites(getFavorites());
 
   const handleVegetableClick = (targetName: string) => {
     if (targetName === activeName) {
       return;
     }
     navigate(`/item/${encodeURIComponent(targetName)}`);
+  };
+
+  const handleFavoriteClick = () => {
+    if (activeName) {
+      toggleFavorite(activeName);
+      refreshFavorites();
+    }
   };
 
   useEffect(() => {
@@ -60,9 +70,18 @@ export function TrendPage() {
   }, [activeName]);
 
   useEffect(() => {
-    const handleStorage = () => setRecentViews(getRecentViews());
+    refreshFavorites();
+    const handleStorage = () => {
+      setRecentViews(getRecentViews());
+      refreshFavorites();
+    };
+    const handleFavoritesChanged = () => refreshFavorites();
     window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    window.addEventListener(FAVORITES_CHANGED_EVENT, handleFavoritesChanged);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener(FAVORITES_CHANGED_EVENT, handleFavoritesChanged);
+    };
   }, []);
 
   const switcher = (
@@ -112,6 +131,9 @@ export function TrendPage() {
                   style={{ cursor: 'pointer', marginBottom: 8 }}
                   onClick={() => navigate(`/item/${encodeURIComponent(item.name)}`)}
                 >
+                  {favorites.includes(item.name) && (
+                    <IconStar style={{ color: '#F7BA1E', marginRight: 4 }} size="small" />
+                  )}
                   {item.name}
                   <Typography.Text type="tertiary" style={{ marginLeft: 6, fontSize: 12 }}>
                     {dayjs(item.timestamp).format('HH:mm')}
@@ -143,6 +165,18 @@ export function TrendPage() {
             </Typography.Text>
           </div>
         </div>
+        <Button
+          icon={
+            favorites.includes(vegetable.name) ? (
+              <IconStar style={{ color: '#F7BA1E' }} />
+            ) : (
+              <IconStarStroked />
+            )
+          }
+          theme="borderless"
+          size="large"
+          onClick={handleFavoriteClick}
+        />
       </header>
 
       {switcher}
@@ -206,6 +240,9 @@ export function TrendPage() {
                   }
                 }}
               >
+                {favorites.includes(item.name) && (
+                  <IconStar style={{ color: '#F7BA1E', marginRight: 4 }} size="small" />
+                )}
                 {item.name}
                 <Typography.Text type="tertiary" style={{ marginLeft: 6, fontSize: 12 }}>
                   {dayjs(item.timestamp).format('HH:mm')}
