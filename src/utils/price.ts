@@ -1,5 +1,5 @@
 import rawPrices from '../mock/vegetable-prices.json';
-import type { PriceTrend, VegetableCategory, VegetablePrice } from '../types/vegetable';
+import type { PriceHistoryPoint, PriceTrend, VegetableCategory, VegetablePrice } from '../types/vegetable';
 
 /** Mock 菜价数据源（不接发改委 API） */
 export const vegetablePrices: VegetablePrice[] = rawPrices as VegetablePrice[];
@@ -319,4 +319,54 @@ export function getCategoryStats(list: VegetablePrice[] = vegetablePrices): Cate
   });
 
   return stats;
+}
+
+/** 波动排行单项 */
+export interface FluctuationRankingItem {
+  name: string;
+  avgPrice: number;
+  fluctuation: number;
+}
+
+/** 价格波动排行 */
+export interface FluctuationRanking {
+  mostFluctuated: FluctuationRankingItem[];
+  mostStable: FluctuationRankingItem[];
+}
+
+/**
+ * 计算单个菜品近七日历史价格的波动幅度（最高价 - 最低价）
+ * @param history7d - 近七日价格历史
+ */
+export function calculateFluctuation(history7d: PriceHistoryPoint[]): number {
+  if (history7d.length === 0) return 0;
+  const prices = history7d.map((item) => item.price);
+  const max = Math.max(...prices);
+  const min = Math.min(...prices);
+  return Number((max - min).toFixed(2));
+}
+
+/**
+ * 获取价格波动排行榜
+ * @param topN - 取前 N 名，默认 5
+ * @param list - 数据源，默认为全部菜价列表
+ */
+export function getFluctuationRanking(
+  topN = 5,
+  list: VegetablePrice[] = vegetablePrices,
+): FluctuationRanking {
+  const ranked = list.map((item) => {
+    const fluctuation = calculateFluctuation(item.history7d);
+    return { name: item.name, avgPrice: item.avgPrice, fluctuation };
+  });
+
+  const mostFluctuated = [...ranked]
+    .sort((a, b) => b.fluctuation - a.fluctuation)
+    .slice(0, topN);
+
+  const mostStable = [...ranked]
+    .sort((a, b) => a.fluctuation - b.fluctuation)
+    .slice(0, topN);
+
+  return { mostFluctuated, mostStable };
 }

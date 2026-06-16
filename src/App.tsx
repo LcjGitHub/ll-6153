@@ -6,6 +6,7 @@ import { TrendPage } from './pages/TrendPage';
 import { ComparePage } from './pages/ComparePage';
 import { FavoritesPage } from './pages/FavoritesPage';
 import { CategoryStatsPage } from './pages/CategoryStatsPage';
+import { FluctuationRankingPage } from './pages/FluctuationRankingPage';
 
 const { Content, Footer } = Layout;
 
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="/收藏" element={<FavoritesPage />} />
             <Route path="/排行榜" element={<RankingPage />} />
             <Route path="/对比" element={<ComparePage />} />
+            <Route path="/波动榜" element={<FluctuationRankingPage />} />
             <Route path="/item/:name" element={<TrendPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
