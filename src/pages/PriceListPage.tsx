@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IconArrowDown, IconArrowUp, IconStar, IconStarStroked } from '@douyinfe/semi-icons';
+import { IconArrowDown, IconArrowUp, IconHistogram, IconStar, IconStarStroked } from '@douyinfe/semi-icons';
 import { Table, Typography, Button } from '@douyinfe/semi-ui';
 import type { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import dayjs from 'dayjs';
@@ -177,6 +177,12 @@ export function PriceListPage() {
               数据日期：{dayjs().format('YYYY-MM-DD')} · Mock 数据，仅供参考
             </Typography.Text>
           </div>
+          <Button
+            icon={<IconHistogram />}
+            onClick={() => navigate('/品类统计')}
+          >
+            查看品类统计
+          </Button>
           <Button
             icon={<IconStar style={{ color: '#F7BA1E' }} />}
             onClick={() => navigate('/收藏')}

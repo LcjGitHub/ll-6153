@@ -1,5 +1,5 @@
 import rawPrices from '../mock/vegetable-prices.json';
-import type { PriceTrend, VegetablePrice } from '../types/vegetable';
+import type { PriceTrend, VegetableCategory, VegetablePrice } from '../types/vegetable';
 
 /** Mock 菜价数据源（不接发改委 API） */
 export const vegetablePrices: VegetablePrice[] = rawPrices as VegetablePrice[];
@@ -286,4 +286,37 @@ export function getMarketOverviewStats(list: VegetablePrice[]): MarketOverviewSt
   const avgPrice = list.length > 0 ? Number((totalPrice / list.length).toFixed(2)) : 0;
 
   return { upCount, downCount, flatCount, avgPrice };
+}
+
+/** 单品类统计 */
+export interface CategoryStat {
+  category: VegetableCategory;
+  count: number;
+  avgPrice: number;
+  upRatio: number;
+}
+
+/** 品类统计汇总 */
+export type CategoryStats = Record<VegetableCategory, CategoryStat>;
+
+/**
+ * 按品类统计菜品数量、平均价格和涨价占比
+ * @param list - 菜价列表，默认为全部菜价
+ */
+export function getCategoryStats(list: VegetablePrice[] = vegetablePrices): CategoryStats {
+  const categories: VegetableCategory[] = ['叶菜', '根茎', '瓜果', '调味'];
+  const stats = {} as CategoryStats;
+
+  categories.forEach((category) => {
+    const items = list.filter((item) => item.category === category);
+    const count = items.length;
+    const totalPrice = items.reduce((sum, item) => sum + item.avgPrice, 0);
+    const avgPrice = count > 0 ? Number((totalPrice / count).toFixed(2)) : 0;
+    const upCount = items.filter((item) => getPriceTrend(item.avgPrice, item.prevPrice) === 'up').length;
+    const upRatio = count > 0 ? Number(((upCount / count) * 100).toFixed(1)) : 0;
+
+    stats[category] = { category, count, avgPrice, upRatio };
+  });
+
+  return stats;
 }
