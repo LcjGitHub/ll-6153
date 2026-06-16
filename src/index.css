@@ -38,6 +38,24 @@ body {
   border-top: 1px solid var(--semi-color-border);
 }
 
+.app-footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.app-footer-link {
+  color: var(--semi-color-text-2);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.app-footer-link:hover {
+  color: var(--semi-color-primary);
+}
+
 .page {
   display: flex;
   flex-direction: column;
