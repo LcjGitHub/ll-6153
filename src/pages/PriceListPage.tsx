@@ -5,6 +5,7 @@ import { Table, Typography, Button } from '@douyinfe/semi-ui';
 import type { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import dayjs from 'dayjs';
 import { FilterBar } from '../components/FilterBar';
+import { FilterPresetSelector } from '../components/FilterPresetSelector';
 import { PriceChange } from '../components/PriceChange';
 import { MarketOverview } from '../components/MarketOverview';
 import type { VegetableCategory, VegetablePrice } from '../types/vegetable';
@@ -20,6 +21,7 @@ import {
 import type { PriceRange, SortField, SortState, TrendFilter } from '../utils/price';
 import { getRecentViews, getFavorites, toggleFavorite } from '../utils/storage';
 import type { RecentViewItem } from '../utils/storage';
+import type { FilterPreset } from '../utils/filterPreset';
 
 export function PriceListPage() {
   const navigate = useNavigate();
@@ -80,6 +82,19 @@ export function PriceListPage() {
     const error = validatePriceRange(nextRange);
     setPriceError(error);
     setMaxPrice(num);
+  };
+
+  const handleLoadPreset = (preset: FilterPreset) => {
+    setKeyword(preset.keyword);
+    setCategory(preset.category);
+    setTrendFilter(preset.trendFilter);
+    const nextMin = preset.minPrice;
+    const nextMax = preset.maxPrice;
+    const nextRange: PriceRange = { min: nextMin, max: nextMax };
+    const error = validatePriceRange(nextRange);
+    setPriceError(error);
+    setMinPrice(nextMin);
+    setMaxPrice(nextMax);
   };
 
   const filtered = useMemo(
@@ -204,6 +219,16 @@ export function PriceListPage() {
           priceError={priceError}
           recentViews={recentViews}
           onNavigate={navigate}
+          presetSelector={
+            <FilterPresetSelector
+              keyword={keyword}
+              category={category}
+              trendFilter={trendFilter}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              onLoadPreset={handleLoadPreset}
+            />
+          }
         />
       </header>
 

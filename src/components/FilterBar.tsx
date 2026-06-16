@@ -33,6 +33,7 @@ export interface FilterBarProps {
   priceError: string | null;
   recentViews: RecentViewItem[];
   onNavigate: (path: string) => void;
+  presetSelector?: React.ReactNode;
 }
 
 export function FilterBar({
@@ -49,16 +50,18 @@ export function FilterBar({
   priceError,
   recentViews,
   onNavigate,
+  presetSelector,
 }: FilterBarProps) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
-      <div style={{ display: 'flex', gap: 8 }}>
+      <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
         <Button onClick={() => onNavigate('/排行榜')}>
           查看涨跌排行榜
         </Button>
         <Button onClick={() => onNavigate('/对比')}>
           多菜品走势对比
         </Button>
+        {presetSelector}
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
         <span style={{ fontSize: 14, color: 'var(--semi-color-text-2)', whiteSpace: 'nowrap' }}>品类</span>
