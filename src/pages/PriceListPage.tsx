@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { IconArrowDown, IconArrowUp } from '@douyinfe/semi-icons';
-import { Table, Typography } from '@douyinfe/semi-ui';
+import { IconArrowDown, IconArrowUp, IconStar, IconStarStroked } from '@douyinfe/semi-icons';
+import { Table, Typography, Button } from '@douyinfe/semi-ui';
 import type { ColumnProps } from '@douyinfe/semi-ui/lib/es/table';
 import dayjs from 'dayjs';
 import { FilterBar } from '../components/FilterBar';
@@ -18,7 +18,7 @@ import {
   validatePriceRange,
 } from '../utils/price';
 import type { PriceRange, SortField, SortState, TrendFilter } from '../utils/price';
-import { getRecentViews } from '../utils/storage';
+import { getRecentViews, getFavorites, toggleFavorite } from '../utils/storage';
 import type { RecentViewItem } from '../utils/storage';
 
 export function PriceListPage() {
@@ -31,13 +31,23 @@ export function PriceListPage() {
   const [priceError, setPriceError] = useState<string | null>(null);
   const [sortState, setSortState] = useState<SortState>({ field: null, order: null });
   const [recentViews, setRecentViews] = useState<RecentViewItem[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
 
   const priceRange: PriceRange = { min: minPrice, max: maxPrice };
 
+  const refreshFavorites = () => setFavorites(getFavorites());
+
   useEffect(() => {
     setRecentViews(getRecentViews());
-    const handleStorage = () => setRecentViews(getRecentViews());
-    const handleFocus = () => setRecentViews(getRecentViews());
+    refreshFavorites();
+    const handleStorage = () => {
+      setRecentViews(getRecentViews());
+      refreshFavorites();
+    };
+    const handleFocus = () => {
+      setRecentViews(getRecentViews());
+      refreshFavorites();
+    };
     window.addEventListener('storage', handleStorage);
     window.addEventListener('focus', handleFocus);
     return () => {
@@ -45,6 +55,12 @@ export function PriceListPage() {
       window.removeEventListener('focus', handleFocus);
     };
   }, []);
+
+  const handleFavoriteClick = (name: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleFavorite(name);
+    refreshFavorites();
+  };
 
   const handleSortClick = (field: SortField) => {
     setSortState((prev) => getNextSortState(prev, field));
@@ -133,16 +149,40 @@ export function PriceListPage() {
       onHeaderCell: () => sortableHeaderCell('prevPrice'),
       render: (price: number) => price.toFixed(2),
     },
+    {
+      title: '操作',
+      dataIndex: 'favorite',
+      width: 80,
+      render: (_: unknown, record: VegetablePrice) => {
+        const isFav = favorites.includes(record.name);
+        return (
+          <Button
+            icon={isFav ? <IconStar style={{ color: '#F7BA1E' }} /> : <IconStarStroked />}
+            theme="borderless"
+            size="small"
+            onClick={(e) => handleFavoriteClick(record.name, e as React.MouseEvent)}
+          />
+        );
+      },
+    },
   ];
 
   return (
     <div className="page">
       <header className="page-header">
-        <div>
-          <Typography.Title heading={3}>菜市场均价公示</Typography.Title>
-          <Typography.Text type="secondary">
-            数据日期：{dayjs().format('YYYY-MM-DD')} · Mock 数据，仅供参考
-          </Typography.Text>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div>
+            <Typography.Title heading={3}>菜市场均价公示</Typography.Title>
+            <Typography.Text type="secondary">
+              数据日期：{dayjs().format('YYYY-MM-DD')} · Mock 数据，仅供参考
+            </Typography.Text>
+          </div>
+          <Button
+            icon={<IconStar style={{ color: '#F7BA1E' }} />}
+            onClick={() => navigate('/收藏')}
+          >
+            我的收藏
+          </Button>
         </div>
         <FilterBar
           keyword={keyword}

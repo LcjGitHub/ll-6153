@@ -60,3 +60,69 @@ export function clearRecentViews(): void {
     console.error('清空最近浏览记录失败:', e);
   }
 }
+
+/** 收藏存储键名 */
+const FAVORITES_KEY = 'vegetable_favorites';
+
+/**
+ * 从 localStorage 读取收藏列表
+ * @returns 收藏的菜品名称数组
+ */
+export function getFavorites(): string[] {
+  try {
+    const stored = localStorage.getItem(FAVORITES_KEY);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('读取收藏列表失败:', e);
+  }
+  return [];
+}
+
+/**
+ * 切换菜品收藏状态
+ * @description 若已收藏则取消收藏，未收藏则添加收藏
+ * @param name - 菜品名称
+ * @returns 切换后的收藏状态（true 表示已收藏）
+ */
+export function toggleFavorite(name: string): boolean {
+  try {
+    const favorites = getFavorites();
+    const exists = favorites.includes(name);
+    let updated: string[];
+    if (exists) {
+      updated = favorites.filter((item) => item !== name);
+    } else {
+      updated = [...favorites, name];
+    }
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+    return !exists;
+  } catch (e) {
+    console.error('切换收藏状态失败:', e);
+    return false;
+  }
+}
+
+/**
+ * 检查菜品是否已收藏
+ * @param name - 菜品名称
+ * @returns 是否已收藏
+ */
+export function isFavorite(name: string): boolean {
+  return getFavorites().includes(name);
+}
+
+/**
+ * 移除指定菜品的收藏
+ * @param name - 菜品名称
+ */
+export function removeFavorite(name: string): void {
+  try {
+    const favorites = getFavorites();
+    const updated = favorites.filter((item) => item !== name);
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
+  } catch (e) {
+    console.error('移除收藏失败:', e);
+  }
+}
