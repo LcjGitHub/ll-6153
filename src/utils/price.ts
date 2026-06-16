@@ -22,6 +22,28 @@ export function getAllVegetableNames(): string[] {
     .sort((a, b) => a.localeCompare(b, 'zh-CN'));
 }
 
+/** 按品类分组的菜名条目 */
+export interface VegetableNamesGroup {
+  category: VegetableCategory;
+  names: string[];
+}
+
+/**
+ * 获取按品类分组的菜名列表
+ * 每个品类内的菜名按拼音/汉字顺序排序，品类顺序为：叶菜、根茎、瓜果、调味
+ * @returns 按品类分组后的数组
+ */
+export function getVegetableNamesGroupedByCategory(): VegetableNamesGroup[] {
+  const categories: VegetableCategory[] = ['叶菜', '根茎', '瓜果', '调味'];
+  return categories.map((category) => {
+    const names = vegetablePrices
+      .filter((item) => item.category === category)
+      .map((item) => item.name)
+      .sort((a, b) => a.localeCompare(b, 'zh-CN'));
+    return { category, names };
+  });
+}
+
 /**
  * 价格区间
  * @property min - 最低价，`undefined` 表示不限制下限

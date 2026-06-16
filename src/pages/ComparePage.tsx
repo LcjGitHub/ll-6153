@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button, Card, Checkbox, Empty, Toast, Typography } from '@douyinfe/semi-ui';
 import dayjs from 'dayjs';
 import { CompareChart } from '../components/CompareChart';
-import { vegetablePrices } from '../utils/price';
+import { getVegetableNamesGroupedByCategory, vegetablePrices } from '../utils/price';
 
 const MAX_SELECT = 3;
 
@@ -19,6 +19,8 @@ const MAX_SELECT = 3;
 export function ComparePage() {
   const navigate = useNavigate();
   const [selectedNames, setSelectedNames] = useState<string[]>([]);
+
+  const groupedVegetables = useMemo(() => getVegetableNamesGroupedByCategory(), []);
 
   const selectedVegetables = useMemo(
     () =>
@@ -70,15 +72,24 @@ export function ComparePage() {
         </div>
 
         <Card style={{ marginBottom: 20 }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 12 }}>
-            {vegetablePrices.map((item) => (
-              <Checkbox
-                key={item.name}
-                checked={selectedNames.includes(item.name)}
-                onChange={(e) => handleCheckboxChange(item.name, e.target.checked ?? false)}
-              >
-                {item.name}
-              </Checkbox>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            {groupedVegetables.map((group) => (
+              <div key={group.category}>
+                <Typography.Title heading={6} style={{ marginBottom: 12, color: 'var(--semi-color-text-2)' }}>
+                  {group.category}
+                </Typography.Title>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))', gap: 12 }}>
+                  {group.names.map((name) => (
+                    <Checkbox
+                      key={name}
+                      checked={selectedNames.includes(name)}
+                      onChange={(e) => handleCheckboxChange(name, e.target.checked ?? false)}
+                    >
+                      {name}
+                    </Checkbox>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </Card>
